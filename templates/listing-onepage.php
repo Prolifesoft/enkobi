@@ -31,6 +31,17 @@ if ( have_posts() ) {
             $business_logo_url = ! empty( $business_logo ) ? $business_logo : $b_logo_default;
         }
         ?>
+        <style>
+        .lp-onepage-header{display:flex;align-items:center;justify-content:space-between;gap:30px;margin-bottom:40px;}
+        .lp-onepage-logo img{max-height:80px;width:auto;}
+        .lp-onepage-nav ul{list-style:none;margin:0;padding:0;display:flex;gap:20px;}
+        .lp-onepage-nav a{text-decoration:none;color:inherit;font-weight:600;}
+        .lp-section{margin-bottom:60px;}
+        .lp-section-title{margin:0 0 20px;font-size:28px;font-weight:700;}
+        .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
+        .lp-gallery-grid img{max-width:100%;height:auto;border-radius:4px;}
+        </style>
+        <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
             <?php if ( ! empty( $business_logo_url ) ) : ?>
                 <div class="lp-onepage-logo"><img src="<?php echo esc_attr( $business_logo_url ); ?>" alt="<?php esc_attr_e( 'Listing Logo', 'listingpro' ); ?>"></div>
@@ -52,18 +63,22 @@ if ( have_posts() ) {
 
         <?php if ( isset( $menu_items['about'] ) ) : ?>
         <section id="about" class="lp-section lp-section-about">
+            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
             <?php echo apply_filters( 'the_content', listingpro_get_metabox( 'lp_listing_description' ) ); ?>
         </section>
         <?php endif; ?>
 
         <?php if ( isset( $menu_items['services'] ) ) : ?>
         <section id="services" class="lp-section lp-section-services">
+            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
             <?php echo apply_filters( 'the_content', $services ); ?>
         </section>
         <?php endif; ?>
 
         <?php if ( isset( $menu_items['gallery'] ) ) : ?>
         <section id="gallery" class="lp-section lp-section-gallery">
+            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
+            <div class="lp-gallery-grid">
             <?php
             if ( is_array( $gallery ) ) {
                 foreach ( $gallery as $image_id ) {
@@ -73,16 +88,19 @@ if ( have_posts() ) {
                 echo apply_filters( 'the_content', $gallery );
             }
             ?>
+            </div>
         </section>
         <?php endif; ?>
 
         <?php if ( isset( $menu_items['video'] ) ) : ?>
         <section id="video" class="lp-section lp-section-video">
+            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
             <?php echo apply_filters( 'the_content', $video ); ?>
         </section>
         <?php endif; ?>
 
         <section id="contact" class="lp-section lp-section-contact">
+            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
             <ul class="lp-contact-list">
                 <?php $address = listingpro_get_metabox( 'gAddress' ); if ( $address ) : ?>
                     <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
@@ -107,6 +125,7 @@ if ( have_posts() ) {
             });
         });
         </script>
+        </div><!-- /.lp-onepage-wrapper -->
         <?php
     }
 }

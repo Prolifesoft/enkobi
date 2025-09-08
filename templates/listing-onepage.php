@@ -168,25 +168,29 @@ if ( have_posts() ) {
         }
         ?>
         <style>
-        .lp-onepage-header{display:flex;align-items:center;justify-content:space-between;gap:30px;margin-bottom:40px;}
+        .lp-onepage-header{position:sticky;top:0;background:#fff;z-index:999;border-bottom:1px solid #eee;}
+        .lp-onepage-header-inner{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:15px 0;}
         .lp-onepage-logo img{max-height:80px;width:auto;}
-        .lp-onepage-nav ul{list-style:none;margin:0;padding:0;display:flex;gap:20px;}
-        .lp-onepage-nav a{text-decoration:none;color:inherit;font-weight:600;}
-        .lp-section{margin-bottom:60px;}
-        .lp-section-title{margin:0 0 20px;font-size:28px;font-weight:700;}
+        .lp-onepage-nav ul{list-style:none;margin:0;padding:0;display:flex;gap:30px;}
+        .lp-onepage-nav a{text-decoration:none;color:#333;font-weight:600;}
+        .lp-onepage-nav a:hover{color:#0073aa;}
+        .lp-section{padding:60px 0;}
+        .lp-section .container{max-width:1170px;margin:0 auto;}
+        .lp-section-title{margin:0 0 30px;font-size:28px;font-weight:700;text-align:center;}
         .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
         .lp-gallery-grid img{max-width:100%;height:auto;border-radius:4px;}
         #singlepostmap{width:100%;height:300px;border-radius:4px;}
         .lp-contact-list{list-style:none;margin:0;padding:0;}
         .lp-contact-list li{margin-bottom:8px;}
-        .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;}
+        .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;justify-content:center;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
-        .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;}
+        .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;justify-content:center;}
         .lp-home-meta li{display:flex;align-items:center;gap:5px;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
+            <div class="container lp-onepage-header-inner">
             <?php if ( ! empty( $business_logo_url ) ) : ?>
                 <div class="lp-onepage-logo"><img src="<?php echo esc_attr( $business_logo_url ); ?>" alt="<?php esc_attr_e( 'Listing Logo', 'listingpro' ); ?>"></div>
             <?php else : ?>
@@ -199,6 +203,7 @@ if ( have_posts() ) {
                     <?php endforeach; ?>
                 </ul>
             </nav>
+            </div>
         </header>
 
         <?php
@@ -226,8 +231,10 @@ if ( have_posts() ) {
                     if ( isset( $menu_items['about'] ) ) {
                         ?>
                         <section id="about" class="lp-section lp-section-about">
-                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-                            <?php echo apply_filters( 'the_content', $description ); ?>
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
+                                <?php echo apply_filters( 'the_content', $description ); ?>
+                            </div>
                         </section>
                         <?php
                     }
@@ -236,12 +243,14 @@ if ( have_posts() ) {
                     if ( isset( $menu_items['services'] ) ) {
                         ?>
                         <section id="services" class="lp-section lp-section-services">
-                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
-                            <ul>
-                            <?php foreach ( $services as $term ) : ?>
-                                <li><?php echo esc_html( $term->name ); ?></li>
-                            <?php endforeach; ?>
-                            </ul>
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
+                                <ul>
+                                <?php foreach ( $services as $term ) : ?>
+                                    <li><?php echo esc_html( $term->name ); ?></li>
+                                <?php endforeach; ?>
+                                </ul>
+                            </div>
                         </section>
                         <?php
                     }
@@ -250,9 +259,11 @@ if ( have_posts() ) {
                     if ( isset( $menu_items['gallery'] ) ) {
                         ?>
                         <section id="gallery" class="lp-section lp-section-gallery">
-                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                            <div class="lp-gallery-grid">
-                            <?php foreach ( $gallery_ids as $image_id ) { echo wp_get_attachment_image( $image_id, 'large' ); } ?>
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
+                                <div class="lp-gallery-grid">
+                                <?php foreach ( $gallery_ids as $image_id ) { echo wp_get_attachment_image( $image_id, 'large' ); } ?>
+                                </div>
                             </div>
                         </section>
                         <?php
@@ -262,8 +273,10 @@ if ( have_posts() ) {
                     if ( isset( $menu_items['video'] ) ) {
                         ?>
                         <section id="video" class="lp-section lp-section-video">
-                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-                            <?php echo apply_filters( 'the_content', (string) $video ); ?>
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
+                                <?php echo apply_filters( 'the_content', (string) $video ); ?>
+                            </div>
                         </section>
                         <?php
                     }
@@ -275,47 +288,53 @@ if ( have_posts() ) {
         <?php if ( isset( $menu_items['map'] ) ) :
             $lp_map_pin = $listingpro_options['lp_map_pin']['url']; ?>
             <section id="map" class="lp-section lp-section-map">
-                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['map'] ); ?></h2>
-                <div id="singlepostmap" class="singlemap" data-lat="<?php echo esc_attr( $latitude ); ?>" data-lan="<?php echo esc_attr( $longitude ); ?>" data-pinicon="<?php echo esc_attr( $lp_map_pin ); ?>"></div>
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['map'] ); ?></h2>
+                    <div id="singlepostmap" class="singlemap" data-lat="<?php echo esc_attr( $latitude ); ?>" data-lan="<?php echo esc_attr( $longitude ); ?>" data-pinicon="<?php echo esc_attr( $lp_map_pin ); ?>"></div>
+                </div>
             </section>
         <?php endif; ?>
 
         <?php if ( isset( $menu_items['hours'] ) ) : ?>
             <section id="hours" class="lp-section lp-section-hours">
-                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['hours'] ); ?></h2>
-                <?php get_template_part( 'include/timings' ); ?>
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['hours'] ); ?></h2>
+                    <?php get_template_part( 'include/timings' ); ?>
+                </div>
             </section>
         <?php endif; ?>
 
         <section id="contact" class="lp-section lp-section-contact">
-            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
-            <ul class="lp-contact-list">
-                <?php if ( 'true' === $location_show && ! empty( $address ) ) : ?>
-                    <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
-                <?php endif; ?>
-                <?php if ( 'true' === $contact_show && ! empty( $email ) ) : ?>
-                    <li class="lp-contact-email"><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
-                <?php endif; ?>
-                <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
-                    <li class="lp-contact-phone"><?php echo esc_html( $phone ); ?></li>
-                <?php endif; ?>
-                <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
-                    $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
-                    <li class="lp-contact-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
-                <?php endif; ?>
-                <?php if ( 'true' === $website_show && ! empty( $website ) ) : ?>
-                    <li class="lp-contact-website"><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
-                <?php endif; ?>
-            </ul>
-            <?php if ( 'true' === $social_show && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
-                <ul class="lp-social-list">
-                    <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa-brands fa-square-facebook"></i></a></li><?php endif; ?>
-                    <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a></li><?php endif; ?>
-                    <?php if ( ! empty( $linkedin ) ) : ?><li><a href="<?php echo esc_url( $linkedin ); ?>" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li><?php endif; ?>
-                    <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa-brands fa-youtube"></i></a></li><?php endif; ?>
-                    <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa-brands fa-square-instagram"></i></a></li><?php endif; ?>
+            <div class="container">
+                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
+                <ul class="lp-contact-list">
+                    <?php if ( 'true' === $location_show && ! empty( $address ) ) : ?>
+                        <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
+                    <?php endif; ?>
+                    <?php if ( 'true' === $contact_show && ! empty( $email ) ) : ?>
+                        <li class="lp-contact-email"><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
+                    <?php endif; ?>
+                    <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
+                        <li class="lp-contact-phone"><?php echo esc_html( $phone ); ?></li>
+                    <?php endif; ?>
+                    <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
+                        $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
+                        <li class="lp-contact-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
+                    <?php endif; ?>
+                    <?php if ( 'true' === $website_show && ! empty( $website ) ) : ?>
+                        <li class="lp-contact-website"><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
+                    <?php endif; ?>
                 </ul>
-            <?php endif; ?>
+                <?php if ( 'true' === $social_show && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
+                    <ul class="lp-social-list">
+                        <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa-brands fa-square-facebook"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $linkedin ) ) : ?><li><a href="<?php echo esc_url( $linkedin ); ?>" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa-brands fa-youtube"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa-brands fa-square-instagram"></i></a></li><?php endif; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
         </section>
 
         <script>

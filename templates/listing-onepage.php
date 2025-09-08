@@ -190,7 +190,8 @@ if ( have_posts() ) {
         .lp-section .container{max-width:1170px;margin:0 auto;}
         .lp-section-title{margin:0 0 30px;font-size:28px;font-weight:700;text-align:center;}
         .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
-        .lp-gallery-grid img{max-width:100%;height:auto;border-radius:4px;}
+        .lp-gallery-item{flex:1 1 calc(33.333% - 10px);}
+        .lp-gallery-grid img{width:100%;height:auto;border-radius:4px;}
         #singlepostmap{width:100%;height:300px;border-radius:4px;}
         .lp-contact-list{list-style:none;margin:0;padding:0;}
         .lp-contact-list li{margin-bottom:8px;}
@@ -283,11 +284,11 @@ if ( have_posts() ) {
                         <section id="gallery" class="lp-section lp-section-gallery">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                                <div class="listing-slide2 img_<?php echo esc_attr( $num_gallery ); ?>" data-images-num="<?php echo esc_attr( $num_gallery ); ?>">
+                                <div class="lp-gallery-grid">
                                 <?php foreach ( $gallery_ids as $image_id ) :
                                     $img_full = wp_get_attachment_image_src( $image_id, 'full' );
                                     if ( $img_full ) : ?>
-                                        <div class="slide"><img src="<?php echo esc_url( $img_full[0] ); ?>" alt="<?php echo esc_attr( $lp_title ); ?>"></div>
+                                        <div class="lp-gallery-item"><img src="<?php echo esc_url( $img_full[0] ); ?>" alt="<?php echo esc_attr( $lp_title ); ?>"></div>
                                     <?php endif;
                                 endforeach; ?>
                                 </div>

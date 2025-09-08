@@ -33,16 +33,28 @@ if ( have_posts() ) {
                 $layout_general[] = $key;
             }
         }
-        if ( ( $pos = array_search( 'lp_content_section', $layout_general, true ) ) !== false ) {
-            array_splice( $layout_general, $pos + 1, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+        if ( empty( $layout_general ) ) {
+            $layout_general = array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section' );
         } else {
-            array_splice( $layout_general, 0, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+            if ( ( $pos = array_search( 'lp_content_section', $layout_general, true ) ) !== false ) {
+                array_splice( $layout_general, $pos + 1, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+            } else {
+                array_splice( $layout_general, 0, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+            }
         }
 
         $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-        $services   = lp_onepage_meta( 'lp_services' );
-        $gallery    = lp_onepage_meta( 'lp_gallery' );
-        $video      = lp_onepage_meta( 'lp_video_embed' );
+        $description = lp_onepage_meta( 'lp_listing_description' );
+        if ( empty( $description ) ) {
+            $description = get_post_field( 'post_content', get_the_ID() );
+        }
+        $services = wp_get_post_terms( get_the_ID(), 'features' );
+        $gallery_ids = get_post_meta( get_the_ID(), 'gallery_image_ids', true );
+        $gallery_ids = ! empty( $gallery_ids ) ? array_filter( explode( ',', $gallery_ids ) ) : array();
+        $video = lp_onepage_meta_by_id( 'video', get_the_ID() );
+        if ( empty( $video ) ) {
+            $video = lp_onepage_meta( 'lp_video_embed' );
+        }
 
         $plan_id = lp_onepage_meta_by_id( 'Plan_id', get_the_ID() );
         if ( empty( $plan_id ) ) {
@@ -76,7 +88,7 @@ if ( have_posts() ) {
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
-                    if ( lp_onepage_meta( 'lp_listing_description' ) ) {
+                    if ( ! empty( $description ) ) {
                         $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
                     }
                     break;
@@ -86,7 +98,7 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_gallery_section':
-                    if ( ! empty( $gallery ) ) {
+                    if ( ! empty( $gallery_ids ) ) {
                         $menu_items['gallery'] = __( 'Resim', 'listingpro' );
                     }
                     break;
@@ -129,6 +141,7 @@ if ( have_posts() ) {
         .lp-contact-list li{margin-bottom:8px;}
         .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
+        .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -148,6 +161,10 @@ if ( have_posts() ) {
 
         <section id="home" class="lp-section lp-section-home">
             <?php the_title('<h1 class="lp-listing-title">', '</h1>'); ?>
+            <?php $tagline = lp_onepage_meta( 'tagline_text' ); ?>
+            <?php if ( ! empty( $tagline ) ) : ?>
+                <p class="lp-listing-tagline"><?php echo esc_html( $tagline ); ?></p>
+            <?php endif; ?>
         </section>
 
         <?php foreach ( $layout_general as $section_key ) {
@@ -157,7 +174,7 @@ if ( have_posts() ) {
                         ?>
                         <section id="about" class="lp-section lp-section-about">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-                            <?php echo apply_filters( 'the_content', lp_onepage_meta( 'lp_listing_description' ) ); ?>
+                            <?php echo apply_filters( 'the_content', $description ); ?>
                         </section>
                         <?php
                     }
@@ -167,7 +184,11 @@ if ( have_posts() ) {
                         ?>
                         <section id="services" class="lp-section lp-section-services">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
-                            <?php echo apply_filters( 'the_content', $services ); ?>
+                            <ul>
+                            <?php foreach ( $services as $term ) : ?>
+                                <li><?php echo esc_html( $term->name ); ?></li>
+                            <?php endforeach; ?>
+                            </ul>
                         </section>
                         <?php
                     }
@@ -178,15 +199,7 @@ if ( have_posts() ) {
                         <section id="gallery" class="lp-section lp-section-gallery">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
                             <div class="lp-gallery-grid">
-                            <?php
-                            if ( is_array( $gallery ) ) {
-                                foreach ( $gallery as $image_id ) {
-                                    echo wp_get_attachment_image( $image_id, 'large' );
-                                }
-                            } else {
-                                echo apply_filters( 'the_content', $gallery );
-                            }
-                            ?>
+                            <?php foreach ( $gallery_ids as $image_id ) { echo wp_get_attachment_image( $image_id, 'large' ); } ?>
                             </div>
                         </section>
                         <?php

@@ -21,9 +21,38 @@ if ( have_posts() ) {
         }
 
         $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-        $services = listingpro_get_metabox( 'lp_services' );
-        $gallery  = listingpro_get_metabox( 'lp_gallery' );
-        $video    = listingpro_get_metabox( 'lp_video_embed' );
+        $services   = listingpro_get_metabox( 'lp_services' );
+        $gallery    = listingpro_get_metabox( 'lp_gallery' );
+        $video      = listingpro_get_metabox( 'lp_video_embed' );
+
+        $plan_id = listing_get_metabox_by_ID( 'Plan_id', get_the_ID() );
+        if ( empty( $plan_id ) ) {
+            $plan_id = 'none';
+        }
+        $map_show    = get_post_meta( $plan_id, 'map_show', true );
+        $social_show = get_post_meta( $plan_id, 'listingproc_social', true );
+        $location_show = get_post_meta( $plan_id, 'listingproc_location', true );
+        $contact_show = get_post_meta( $plan_id, 'contact_show', true );
+        $website_show = get_post_meta( $plan_id, 'listingproc_website', true );
+        $hours_show   = get_post_meta( $plan_id, 'listingproc_bhours', true );
+        if ( 'none' === $plan_id ) {
+            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = 'true';
+        }
+
+        $address   = listingpro_get_metabox( 'gAddress' );
+        $phone     = listingpro_get_metabox( 'phone' );
+        $website   = listingpro_get_metabox( 'website' );
+        $email     = listingpro_get_metabox( 'email' );
+        $whatsapp  = listingpro_get_metabox( 'whatsapp' );
+        $latitude  = listingpro_get_metabox( 'latitude' );
+        $longitude = listingpro_get_metabox( 'longitude' );
+        $hours     = listingpro_get_metabox( 'business_hours' );
+
+        $facebook  = listingpro_get_metabox( 'facebook' );
+        $twitter   = listingpro_get_metabox( 'twitter' );
+        $linkedin  = listingpro_get_metabox( 'linkedin' );
+        $youtube   = listingpro_get_metabox( 'youtube' );
+        $instagram = listingpro_get_metabox( 'instagram' );
 
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
@@ -50,6 +79,12 @@ if ( have_posts() ) {
             }
         }
 
+        if ( 'true' === $map_show && ! empty( $latitude ) && ! empty( $longitude ) ) {
+            $menu_items['map'] = __( 'Harita', 'listingpro' );
+        }
+        if ( 'true' === $hours_show && ! empty( $hours ) ) {
+            $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
+        }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
 
         $b_logo       = $listingpro_options['business_logo_switch'];
@@ -70,6 +105,11 @@ if ( have_posts() ) {
         .lp-section-title{margin:0 0 20px;font-size:28px;font-weight:700;}
         .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
         .lp-gallery-grid img{max-width:100%;height:auto;border-radius:4px;}
+        #singlepostmap{width:100%;height:300px;border-radius:4px;}
+        .lp-contact-list{list-style:none;margin:0;padding:0;}
+        .lp-contact-list li{margin-bottom:8px;}
+        .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;}
+        .lp-social-list a{text-decoration:none;font-size:20px;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -138,19 +178,50 @@ if ( have_posts() ) {
             }
         endforeach; ?>
 
+        <?php if ( isset( $menu_items['map'] ) ) :
+            $lp_map_pin = $listingpro_options['lp_map_pin']['url']; ?>
+            <section id="map" class="lp-section lp-section-map">
+                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['map'] ); ?></h2>
+                <div id="singlepostmap" class="singlemap" data-lat="<?php echo esc_attr( $latitude ); ?>" data-lan="<?php echo esc_attr( $longitude ); ?>" data-pinicon="<?php echo esc_attr( $lp_map_pin ); ?>"></div>
+            </section>
+        <?php endif; ?>
+
+        <?php if ( isset( $menu_items['hours'] ) ) : ?>
+            <section id="hours" class="lp-section lp-section-hours">
+                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['hours'] ); ?></h2>
+                <?php get_template_part( 'include/timings' ); ?>
+            </section>
+        <?php endif; ?>
+
         <section id="contact" class="lp-section lp-section-contact">
             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
             <ul class="lp-contact-list">
-                <?php $address = listingpro_get_metabox( 'gAddress' ); if ( $address ) : ?>
+                <?php if ( 'true' === $location_show && ! empty( $address ) ) : ?>
                     <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
                 <?php endif; ?>
-                <?php $phone = listingpro_get_metabox( 'phone' ); if ( $phone ) : ?>
+                <?php if ( 'true' === $contact_show && ! empty( $email ) ) : ?>
+                    <li class="lp-contact-email"><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
+                <?php endif; ?>
+                <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
                     <li class="lp-contact-phone"><?php echo esc_html( $phone ); ?></li>
                 <?php endif; ?>
-                <?php $website = listingpro_get_metabox( 'website' ); if ( $website ) : ?>
+                <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
+                    $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
+                    <li class="lp-contact-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
+                <?php endif; ?>
+                <?php if ( 'true' === $website_show && ! empty( $website ) ) : ?>
                     <li class="lp-contact-website"><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                 <?php endif; ?>
             </ul>
+            <?php if ( 'true' === $social_show && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
+                <ul class="lp-social-list">
+                    <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa-brands fa-square-facebook"></i></a></li><?php endif; ?>
+                    <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a></li><?php endif; ?>
+                    <?php if ( ! empty( $linkedin ) ) : ?><li><a href="<?php echo esc_url( $linkedin ); ?>" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li><?php endif; ?>
+                    <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa-brands fa-youtube"></i></a></li><?php endif; ?>
+                    <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa-brands fa-square-instagram"></i></a></li><?php endif; ?>
+                </ul>
+            <?php endif; ?>
         </section>
 
         <script>

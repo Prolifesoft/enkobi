@@ -5,6 +5,25 @@ if ( have_posts() ) {
         the_post();
         global $listingpro_options;
 
+        if ( ! function_exists( 'lp_onepage_meta' ) ) {
+            function lp_onepage_meta( $key, $post_id = null ) {
+                $id = $post_id ? $post_id : get_the_ID();
+                if ( function_exists( 'listingpro_get_metabox' ) ) {
+                    return listingpro_get_metabox( $key );
+                }
+                return get_post_meta( $id, $key, true );
+            }
+        }
+
+        if ( ! function_exists( 'lp_onepage_meta_by_id' ) ) {
+            function lp_onepage_meta_by_id( $key, $post_id ) {
+                if ( function_exists( 'listing_get_metabox_by_ID' ) ) {
+                    return listing_get_metabox_by_ID( $key, $post_id );
+                }
+                return get_post_meta( $post_id, $key, true );
+            }
+        }
+
         $layout_keys = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             : array();
@@ -21,11 +40,11 @@ if ( have_posts() ) {
         }
 
         $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-        $services   = listingpro_get_metabox( 'lp_services' );
-        $gallery    = listingpro_get_metabox( 'lp_gallery' );
-        $video      = listingpro_get_metabox( 'lp_video_embed' );
+        $services   = lp_onepage_meta( 'lp_services' );
+        $gallery    = lp_onepage_meta( 'lp_gallery' );
+        $video      = lp_onepage_meta( 'lp_video_embed' );
 
-        $plan_id = listing_get_metabox_by_ID( 'Plan_id', get_the_ID() );
+        $plan_id = lp_onepage_meta_by_id( 'Plan_id', get_the_ID() );
         if ( empty( $plan_id ) ) {
             $plan_id = 'none';
         }
@@ -39,25 +58,25 @@ if ( have_posts() ) {
             $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = 'true';
         }
 
-        $address   = listingpro_get_metabox( 'gAddress' );
-        $phone     = listingpro_get_metabox( 'phone' );
-        $website   = listingpro_get_metabox( 'website' );
-        $email     = listingpro_get_metabox( 'email' );
-        $whatsapp  = listingpro_get_metabox( 'whatsapp' );
-        $latitude  = listingpro_get_metabox( 'latitude' );
-        $longitude = listingpro_get_metabox( 'longitude' );
-        $hours     = listingpro_get_metabox( 'business_hours' );
+        $address   = lp_onepage_meta( 'gAddress' );
+        $phone     = lp_onepage_meta( 'phone' );
+        $website   = lp_onepage_meta( 'website' );
+        $email     = lp_onepage_meta( 'email' );
+        $whatsapp  = lp_onepage_meta( 'whatsapp' );
+        $latitude  = lp_onepage_meta( 'latitude' );
+        $longitude = lp_onepage_meta( 'longitude' );
+        $hours     = lp_onepage_meta( 'business_hours' );
 
-        $facebook  = listingpro_get_metabox( 'facebook' );
-        $twitter   = listingpro_get_metabox( 'twitter' );
-        $linkedin  = listingpro_get_metabox( 'linkedin' );
-        $youtube   = listingpro_get_metabox( 'youtube' );
-        $instagram = listingpro_get_metabox( 'instagram' );
+        $facebook  = lp_onepage_meta( 'facebook' );
+        $twitter   = lp_onepage_meta( 'twitter' );
+        $linkedin  = lp_onepage_meta( 'linkedin' );
+        $youtube   = lp_onepage_meta( 'youtube' );
+        $instagram = lp_onepage_meta( 'instagram' );
 
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
-                    if ( listingpro_get_metabox( 'lp_listing_description' ) ) {
+                    if ( lp_onepage_meta( 'lp_listing_description' ) ) {
                         $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
                     }
                     break;
@@ -92,7 +111,7 @@ if ( have_posts() ) {
         $business_logo_url = '';
         if ( $b_logo && 'yes' === $allow_logo ) {
             $b_logo_default    = $listingpro_options['business_logo_default']['url'];
-            $business_logo     = listing_get_metabox_by_ID( 'business_logo', get_the_ID() );
+            $business_logo     = lp_onepage_meta_by_id( 'business_logo', get_the_ID() );
             $business_logo_url = ! empty( $business_logo ) ? $business_logo : $b_logo_default;
         }
         ?>
@@ -137,7 +156,7 @@ if ( have_posts() ) {
                     if ( isset( $menu_items['about'] ) ) : ?>
                         <section id="about" class="lp-section lp-section-about">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-                            <?php echo apply_filters( 'the_content', listingpro_get_metabox( 'lp_listing_description' ) ); ?>
+                            <?php echo apply_filters( 'the_content', lp_onepage_meta( 'lp_listing_description' ) ); ?>
                         </section>
                     <?php endif;
                     break;

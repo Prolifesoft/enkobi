@@ -165,19 +165,23 @@ if ( have_posts() ) {
             </nav>
         </header>
 
+        <?php
+        $header_bg = isset( $listingpro_options['lp_detail_page_styles4_bg'] ) ? $listingpro_options['lp_detail_page_styles4_bg'] : array();
+        ?>
         <section id="home" class="lp-section lp-section-home">
-            <?php the_title('<h1 class="lp-listing-title">', '</h1>'); ?>
-            <?php $tagline = lp_onepage_meta( 'tagline_text' ); ?>
-            <?php if ( ! empty( $tagline ) ) : ?>
-                <p class="lp-listing-tagline"><?php echo esc_html( $tagline ); ?></p>
-            <?php endif; ?>
-            <?php if ( ! empty( $locations ) || ! empty( $categories ) || ! empty( $price_html ) ) : ?>
-                <ul class="lp-home-meta">
-                    <?php if ( ! empty( $locations ) ) : ?><li><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li><?php endif; ?>
-                    <?php if ( ! empty( $categories ) ) : ?><li><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li><?php endif; ?>
-                    <?php if ( ! empty( $price_html ) ) : ?><li><?php echo $price_html; ?></li><?php endif; ?>
-                </ul>
-            <?php endif; ?>
+            <div class="lp-listing-top-title-header" <?php if ( ! empty( $header_bg['url'] ) ) : ?>style="background-image:url(<?php echo esc_url( $header_bg['url'] ); ?>)"<?php endif; ?>>
+                <div class="lp-header-overlay"></div>
+                <div class="container pos-relative">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <?php
+                            include locate_template( 'templates/single-list/listing-details-style4/content/title-bar.php' );
+                            get_template_part( 'templates/single-list/listing-details-style4/content/gallery' );
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <?php foreach ( $layout_general as $section_key ) {

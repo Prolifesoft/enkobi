@@ -53,6 +53,9 @@
 			get_template_part( 'templates/listing-style4' );
 		}
                else if( $lp_detail_page_styles == 'lp_detail_page_styles5' ) {
+                  get_template_part( 'templates/listing_detail5' );
+               }
+               else if( $lp_detail_page_styles == 'lp_detail_page_styles6' ) {
                   get_template_part( 'templates/listing-onepage' );
                }
 

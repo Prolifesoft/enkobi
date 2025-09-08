@@ -2187,7 +2187,8 @@ Redux::setSection($opt_name, array(
                 'lp_detail_page_styles2' => 'Listing Detail Page Style 2',
                 'lp_detail_page_styles3' => 'Listing Detail Page Style 3',
                 'lp_detail_page_styles4' => 'Listing Detail Page Style 4',
-                'lp_detail_page_styles5' => 'Listing Detail Page Style 5 (One Page)',
+                'lp_detail_page_styles5' => 'Listing Detail Page Style 5',
+                'lp_detail_page_styles6' => 'Listing Detail Page Style 6 (One Page)',
             ),
             'default' => 'lp_detail_page_styles1',
         ),
@@ -2440,7 +2441,7 @@ Redux::setSection($opt_name, array(
             'id' => 'lp-detail-page-layout6-content',
             'type' => 'sorter',
             'title' => 'Content Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles5'),
+            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
             'desc' => 'Shuffle elements within Listing Detail Content',
             'compiler' => 'true',
             'options' => array(
@@ -2468,7 +2469,7 @@ Redux::setSection($opt_name, array(
             'id' => 'lp-detail-page-layout6-rsidebar',
             'type' => 'sorter',
             'title' => 'Sidebar Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles5'),
+            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
             'desc' => 'Shuffle elements within Listing SideBar',
             'compiler' => 'true',
             'options' => array(

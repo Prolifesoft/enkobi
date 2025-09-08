@@ -36,6 +36,7 @@ if ( have_posts() ) {
         $services = wp_get_post_terms( get_the_ID(), 'features' );
         $gallery_ids = get_post_meta( get_the_ID(), 'gallery_image_ids', true );
         $gallery_ids = ! empty( $gallery_ids ) ? array_filter( explode( ',', $gallery_ids ) ) : array();
+        $num_gallery = count( $gallery_ids );
         $video      = lp_onepage_meta_by_id( 'video', get_the_ID() );
         if ( empty( $video ) ) {
             $video = lp_onepage_meta( 'lp_video_embed' );
@@ -276,8 +277,13 @@ if ( have_posts() ) {
                         <section id="gallery" class="lp-section lp-section-gallery">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                                <div class="lp-gallery-grid">
-                                <?php foreach ( $gallery_ids as $image_id ) { echo wp_get_attachment_image( $image_id, 'large' ); } ?>
+                                <div class="listing-slide2 img_<?php echo esc_attr( $num_gallery ); ?>" data-images-num="<?php echo esc_attr( $num_gallery ); ?>">
+                                <?php foreach ( $gallery_ids as $image_id ) :
+                                    $img_full = wp_get_attachment_image_src( $image_id, 'full' );
+                                    if ( $img_full ) : ?>
+                                        <div class="slide"><img src="<?php echo esc_url( $img_full[0] ); ?>" alt="<?php echo esc_attr( $lp_title ); ?>"></div>
+                                    <?php endif;
+                                endforeach; ?>
                                 </div>
                             </div>
                         </section>
@@ -361,6 +367,10 @@ if ( have_posts() ) {
                         <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa fa-instagram"></i></a></li><?php endif; ?>
                     </ul>
                 <?php endif; ?>
+                <?php if ( ! empty( $price_html ) ) : ?>
+                    <div class="lp-contact-price"><?php echo $price_html; ?></div>
+                <?php endif; ?>
+                <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>
             </div>
         </section>
 

@@ -177,7 +177,7 @@ if ( have_posts() ) {
         .lp-onepage-logo img{width:60px;height:60px;border-radius:50%;object-fit:cover;}
         .lp-onepage-name{font-weight:700;font-size:20px;}
         .lp-onepage-nav ul{list-style:none;margin:0;padding:0;display:flex;gap:30px;}
-        .lp-onepage-nav a{text-decoration:none;color:#333;font-weight:600;}
+        .lp-onepage-nav a{text-decoration:none;color:#333;font-weight:600;display:flex;align-items:center;gap:5px;}
         .lp-onepage-nav a:hover{color:#0073aa;}
         .lp-section{padding:60px 0;}
         .lp-section .container{max-width:1170px;margin:0 auto;}
@@ -209,6 +209,13 @@ if ( have_posts() ) {
                     <?php foreach ( $menu_items as $slug => $label ) : ?>
                         <li><a href="#<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></a></li>
                     <?php endforeach; ?>
+                    <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
+                        <li class="lp-nav-phone"><a href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i><?php echo esc_html( $phone ); ?></a></li>
+                    <?php endif; ?>
+                    <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
+                        $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
+                        <li class="lp-nav-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><i class="fa fa-whatsapp"></i><?php echo esc_html( $whatsapp ); ?></a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             </div>

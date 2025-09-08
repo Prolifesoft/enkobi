@@ -2187,8 +2187,7 @@ Redux::setSection($opt_name, array(
                 'lp_detail_page_styles2' => 'Listing Detail Page Style 2',
                 'lp_detail_page_styles3' => 'Listing Detail Page Style 3',
                 'lp_detail_page_styles4' => 'Listing Detail Page Style 4',
-                'lp_detail_page_styles5' => 'Listing Detail Page Style 5', //classic new style
-                'lp_detail_page_styles6' => 'Listing Detail Page Style 6 (One Page)',
+                'lp_detail_page_styles5' => 'Listing Detail Page Style 5 (One Page)',
             ),
             'default' => 'lp_detail_page_styles1',
         ),

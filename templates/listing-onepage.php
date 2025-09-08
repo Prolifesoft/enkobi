@@ -85,6 +85,10 @@ if ( have_posts() ) {
         $youtube   = lp_onepage_meta( 'youtube' );
         $instagram = lp_onepage_meta( 'instagram' );
 
+        $locations  = get_the_terms( get_the_ID(), 'location' );
+        $categories = get_the_terms( get_the_ID(), 'listing-category' );
+        $price_html = function_exists( 'listingpro_price_dynesty' ) ? listingpro_price_dynesty( get_the_ID() ) : '';
+
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
@@ -142,6 +146,8 @@ if ( have_posts() ) {
         .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
+        .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;}
+        .lp-home-meta li{display:flex;align-items:center;gap:5px;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -164,6 +170,13 @@ if ( have_posts() ) {
             <?php $tagline = lp_onepage_meta( 'tagline_text' ); ?>
             <?php if ( ! empty( $tagline ) ) : ?>
                 <p class="lp-listing-tagline"><?php echo esc_html( $tagline ); ?></p>
+            <?php endif; ?>
+            <?php if ( ! empty( $locations ) || ! empty( $categories ) || ! empty( $price_html ) ) : ?>
+                <ul class="lp-home-meta">
+                    <?php if ( ! empty( $locations ) ) : ?><li><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li><?php endif; ?>
+                    <?php if ( ! empty( $categories ) ) : ?><li><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li><?php endif; ?>
+                    <?php if ( ! empty( $price_html ) ) : ?><li><?php echo $price_html; ?></li><?php endif; ?>
+                </ul>
             <?php endif; ?>
         </section>
 

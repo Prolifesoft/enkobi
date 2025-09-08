@@ -2181,14 +2181,14 @@ Redux::setSection($opt_name, array(
             'id' => 'lp_detail_page_styles',
             'type' => 'select',
             'title' => __('Select listing detail page Style', 'listingpro'),
-            'desc' => __('Choose from 1 of 4 styles.', 'listingpro'),
+            'desc' => __('Choose from the available styles.', 'listingpro'),
             'options' => array(
                 'lp_detail_page_styles1' => 'Listing Detail Page Style 1',
                 'lp_detail_page_styles2' => 'Listing Detail Page Style 2',
                 'lp_detail_page_styles3' => 'Listing Detail Page Style 3',
                 'lp_detail_page_styles4' => 'Listing Detail Page Style 4',
-				'lp_detail_page_styles6' => 'Listing Detail Page Style 5' //classic new style
-                /* 'lp_detail_page_styles5' => 'Listing Detail Page Style 5', */
+                'lp_detail_page_styles5' => 'Listing Detail Page Style 5',
+                'lp_detail_page_styles6' => 'Listing Detail Page Style 6 (One Page)',
             ),
             'default' => 'lp_detail_page_styles1',
         ),
@@ -2505,7 +2505,7 @@ Redux::setSection($opt_name, array(
             'id' => 'lp_detail_page_video_display',
             'type' => 'button_set',
             'title' => esc_html__('Video Display Option', 'listingpro'),
-            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles6', 'lp_detail_page_styles1')), //classic new style
+            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles5', 'lp_detail_page_styles1')), //classic new style
             'subtitle' => esc_html__('On=Show youtube video in popup, off=embed', 'listingpro'),
             'options' => array(
                 'on' => 'On',
@@ -2549,7 +2549,7 @@ Redux::setSection($opt_name, array(
             'title' => esc_html__('Discount/Deals (sidebar)', 'listingpro'),
             'subtitle' => esc_html__('design for sidebar area', 'listingpro'),
             'desc' => esc_html__('The design used when deals show within the sidebar.', 'listingpro'),
-            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles4', 'lp_detail_page_styles3', 'lp_detail_page_styles2', 'lp_detail_page_styles1' , 'lp_detail_page_styles6')), //classic new style
+            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles4', 'lp_detail_page_styles3', 'lp_detail_page_styles2', 'lp_detail_page_styles1' , 'lp_detail_page_styles5')), //classic new style
             'options' => array(
                 '1' => array(
                     'alt' => 'Deals Design',

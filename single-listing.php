@@ -52,14 +52,13 @@
 		{
 			get_template_part( 'templates/listing-style4' );
 		}
-		else if( $lp_detail_page_styles == 'lp_detail_page_styles5' )
-		{
-			get_template_part( 'templates/listing_detail5' );
-		}else if( $lp_detail_page_styles == 'lp_detail_page_styles6' ) {
-		   get_template_part( 'templates/listing-detail6' ); //classic new style
-		}
+               else if( $lp_detail_page_styles == 'lp_detail_page_styles5' ) {
+                  get_template_part( 'templates/listing_detail5' );
+               }
+               else if( $lp_detail_page_styles == 'lp_detail_page_styles6' ) {
+                  get_template_part( 'templates/listing-onepage' );
+               }
 
-		do_action( 'listing_single_page_content');
+                do_action( 'listing_single_page_content');
         get_footer();
     }
-	 

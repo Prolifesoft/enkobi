@@ -68,7 +68,7 @@ if ( have_posts() ) {
                     break;
                 case 'lp_gallery_section':
                     if ( ! empty( $gallery ) ) {
-                        $menu_items['gallery'] = __( 'Galeri', 'listingpro' );
+                        $menu_items['gallery'] = __( 'Resim', 'listingpro' );
                     }
                     break;
                 case 'lp_video_section':

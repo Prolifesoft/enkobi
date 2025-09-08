@@ -343,8 +343,10 @@
     "lp-detail-page-layout6-content": {
         "general": {
             "placebo": "placebo",
-            "lp_video_section": "Youtube Video",
+            "lp_video_section": "Video",
             "lp_content_section": "Details",
+            "lp_services_section": "Services",
+            "lp_gallery_section": "Resim",
             "lp_features_section": "Listing Features",
             "lp_additional_section": "Additional Details",
             "lp_faqs_section": "FAQs",

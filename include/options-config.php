@@ -2223,8 +2223,10 @@ Redux::setSection($opt_name, array(
             'compiler' => 'true',
             'options' => array(
                 'general' => array(
-                    'lp_video_section' => 'Youtube Video',
+                    'lp_video_section' => 'Video',
                     'lp_content_section' => 'Details',
+                    'lp_services_section' => 'Services',
+                    'lp_gallery_section' => 'Resim',
                     // New update 2.8                    // 'lp_openFields_section' => 'Listing Global Form Fields',
                     // End New update 2.8
                     'lp_features_section' => 'Listing Features',

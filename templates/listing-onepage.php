@@ -24,6 +24,12 @@ if ( have_posts() ) {
             }
         }
 
+        if ( ! function_exists( 'lp_onepage_on' ) ) {
+            function lp_onepage_on( $flag ) {
+                return ! in_array( $flag, array( 'false', '0', 'off', 'no' ), true );
+            }
+        }
+
         $layout_general = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             : array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_faqs_section' );
@@ -143,21 +149,21 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_faqs_section':
-                    if ( 'true' === $faqs_show && ! empty( $faqs ) && ! empty( $faqs['faq'][1] ) ) {
+                    if ( lp_onepage_on( $faqs_show ) && ! empty( $faqs ) && ! empty( $faqs['faq'][1] ) ) {
                         $menu_items['faq'] = __( 'SSS', 'listingpro' );
                     }
                     break;
             }
         }
 
-        if ( 'true' === $map_show && ! empty( $latitude ) && ! empty( $longitude ) ) {
+        if ( lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude ) ) {
             $menu_items['map'] = __( 'Harita', 'listingpro' );
         }
         $has_hours = ! empty( $hours );
         if ( is_array( $hours ) ) {
             $has_hours = ! empty( array_filter( $hours ) );
         }
-        if ( 'true' === $hours_show && $has_hours ) {
+        if ( lp_onepage_on( $hours_show ) && $has_hours ) {
             $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
         }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
@@ -210,10 +216,10 @@ if ( have_posts() ) {
                     <?php foreach ( $menu_items as $slug => $label ) : ?>
                         <li><a href="#<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></a></li>
                     <?php endforeach; ?>
-                    <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
+                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
                         <li class="lp-nav-phone"><a href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i><?php echo esc_html( $phone ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
+                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $whatsapp ) ) :
                         $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
                         <li class="lp-nav-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><i class="fa fa-whatsapp"></i><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
@@ -296,7 +302,7 @@ if ( have_posts() ) {
                         <section id="video" class="lp-section lp-section-video">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-                                <?php echo wp_kses_post( $video_html ); ?>
+                                <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true ) ) ) ); ?>
                             </div>
                         </section>
                         <?php
@@ -341,24 +347,24 @@ if ( have_posts() ) {
             <div class="container">
                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
                 <ul class="lp-contact-list">
-                    <?php if ( 'true' === $location_show && ! empty( $address ) ) : ?>
+                    <?php if ( lp_onepage_on( $location_show ) && ! empty( $address ) ) : ?>
                         <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
                     <?php endif; ?>
-                    <?php if ( 'true' === $contact_show && ! empty( $email ) ) : ?>
+                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $email ) ) : ?>
                         <li class="lp-contact-email"><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( 'true' === $contact_show && ! empty( $phone ) ) : ?>
+                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
                         <li class="lp-contact-phone"><?php echo esc_html( $phone ); ?></li>
                     <?php endif; ?>
-                    <?php if ( 'true' === $contact_show && ! empty( $whatsapp ) ) :
+                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $whatsapp ) ) :
                         $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
                         <li class="lp-contact-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( 'true' === $website_show && ! empty( $website ) ) : ?>
+                    <?php if ( lp_onepage_on( $website_show ) && ! empty( $website ) ) : ?>
                         <li class="lp-contact-website"><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                     <?php endif; ?>
                 </ul>
-                <?php if ( 'true' === $social_show && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
+                <?php if ( lp_onepage_on( $social_show ) && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
                     <ul class="lp-social-list">
                         <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa fa-facebook-square"></i></a></li><?php endif; ?>
                         <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa fa-twitter"></i></a></li><?php endif; ?>

@@ -2181,13 +2181,14 @@ Redux::setSection($opt_name, array(
             'id' => 'lp_detail_page_styles',
             'type' => 'select',
             'title' => __('Select listing detail page Style', 'listingpro'),
-            'desc' => __('Choose from 1 of 4 styles.', 'listingpro'),
+            'desc' => __('Choose from the available styles.', 'listingpro'),
             'options' => array(
                 'lp_detail_page_styles1' => 'Listing Detail Page Style 1',
                 'lp_detail_page_styles2' => 'Listing Detail Page Style 2',
                 'lp_detail_page_styles3' => 'Listing Detail Page Style 3',
                 'lp_detail_page_styles4' => 'Listing Detail Page Style 4',
-				'lp_detail_page_styles6' => 'Listing Detail Page Style 5' //classic new style
+                'lp_detail_page_styles6' => 'Listing Detail Page Style 5', //classic new style
+                'lp_detail_page_styles7' => 'Listing Detail Page Style 6 (One Page)',
                 /* 'lp_detail_page_styles5' => 'Listing Detail Page Style 5', */
             ),
             'default' => 'lp_detail_page_styles1',

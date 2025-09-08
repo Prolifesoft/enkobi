@@ -150,26 +150,31 @@ if ( have_posts() ) {
             <?php the_title('<h1 class="lp-listing-title">', '</h1>'); ?>
         </section>
 
-        <?php foreach ( $layout_general as $section_key ) :
+        <?php foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
-                    if ( isset( $menu_items['about'] ) ) : ?>
+                    if ( isset( $menu_items['about'] ) ) {
+                        ?>
                         <section id="about" class="lp-section lp-section-about">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
                             <?php echo apply_filters( 'the_content', lp_onepage_meta( 'lp_listing_description' ) ); ?>
                         </section>
-                    <?php endif;
+                        <?php
+                    }
                     break;
                 case 'lp_services_section':
-                    if ( isset( $menu_items['services'] ) ) : ?>
+                    if ( isset( $menu_items['services'] ) ) {
+                        ?>
                         <section id="services" class="lp-section lp-section-services">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
                             <?php echo apply_filters( 'the_content', $services ); ?>
                         </section>
-                    <?php endif;
+                        <?php
+                    }
                     break;
                 case 'lp_gallery_section':
-                    if ( isset( $menu_items['gallery'] ) ) : ?>
+                    if ( isset( $menu_items['gallery'] ) ) {
+                        ?>
                         <section id="gallery" class="lp-section lp-section-gallery">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
                             <div class="lp-gallery-grid">
@@ -184,18 +189,22 @@ if ( have_posts() ) {
                             ?>
                             </div>
                         </section>
-                    <?php endif;
+                        <?php
+                    }
                     break;
                 case 'lp_video_section':
-                    if ( isset( $menu_items['video'] ) ) : ?>
+                    if ( isset( $menu_items['video'] ) ) {
+                        ?>
                         <section id="video" class="lp-section lp-section-video">
                             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
                             <?php echo apply_filters( 'the_content', $video ); ?>
                         </section>
-                    <?php endif;
+                        <?php
+                    }
                     break;
             }
-        endforeach; ?>
+        }
+        ?>
 
         <?php if ( isset( $menu_items['map'] ) ) :
             $lp_map_pin = $listingpro_options['lp_map_pin']['url']; ?>

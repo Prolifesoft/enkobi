@@ -2181,14 +2181,14 @@ Redux::setSection($opt_name, array(
             'id' => 'lp_detail_page_styles',
             'type' => 'select',
             'title' => __('Select listing detail page Style', 'listingpro'),
-            'desc' => __('Choose from 1 of 4 styles.', 'listingpro'),
+            'desc' => __('Choose from the available styles.', 'listingpro'),
             'options' => array(
                 'lp_detail_page_styles1' => 'Listing Detail Page Style 1',
                 'lp_detail_page_styles2' => 'Listing Detail Page Style 2',
                 'lp_detail_page_styles3' => 'Listing Detail Page Style 3',
                 'lp_detail_page_styles4' => 'Listing Detail Page Style 4',
-				'lp_detail_page_styles6' => 'Listing Detail Page Style 5' //classic new style
-                /* 'lp_detail_page_styles5' => 'Listing Detail Page Style 5', */
+                'lp_detail_page_styles5' => 'Listing Detail Page Style 5',
+                'lp_detail_page_styles6' => 'Listing Detail Page Style 6 (One Page)',
             ),
             'default' => 'lp_detail_page_styles1',
         ),
@@ -2208,6 +2208,60 @@ Redux::setSection($opt_name, array(
                     'lp_services_section' => 'Services',
                     'lp_reviews_section' => 'Reviews',
                     'lp_quote_section' => 'Quote Form',
+                ),
+                'disabled' => array(
+                    '' => '',
+                ),
+            ),
+        ),
+        array(
+            'id' => 'lp-detail-page-layout6-content',
+            'type' => 'sorter',
+            'title' => 'Content Layout',
+            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
+            'desc' => 'Shuffle elements within Listing Detail Content',
+            'compiler' => 'true',
+            'options' => array(
+                'general' => array(
+                    'lp_video_section' => 'Video',
+                    'lp_content_section' => 'Details',
+                    'lp_services_section' => 'Services',
+                    'lp_gallery_section' => 'Resim',
+                    // New update 2.8                    // 'lp_openFields_section' => 'Listing Global Form Fields',
+                    // End New update 2.8
+                    'lp_features_section' => 'Listing Features',
+                    'lp_additional_section' => 'Additional Details',
+                    'lp_faqs_section' => 'FAQs',
+                    'lp_event_section' => 'Event',
+                    'lp_announcements_section' => 'Announcements',
+                    'lp_offers_section' => 'Offers/Discounts/Deals',
+                    'lp_menu_section' => 'Menu',
+                    'lp_reviews_section' => 'Reviews',
+                    'lp_reviewform_section' => 'Review Form',
+                ),
+                'disabled' => array(
+                    '' => '',
+                ),
+            ),
+        ),
+        array(
+            'id' => 'lp-detail-page-layout6-rsidebar',
+            'type' => 'sorter',
+            'title' => 'Sidebar Layout',
+            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
+            'desc' => 'Shuffle elements within Listing SideBar',
+            'compiler' => 'true',
+            'options' => array(
+                'sidebar' => array(
+                    'lp_mapsocial_section' => 'Map/Contacts',
+                    'lp_event_section' => 'Event',
+                    'lp_booking_section' => 'Appointments',
+                    'lp_timing_section' => 'Timings',
+                    'lp_quicks_section' => 'Quick Actions',
+                    'lp_additional_section' => 'Additional Details',
+                    'lp_offers_section' => 'Offers/Discounts/Deals',
+                    'lp_leadform_section' => 'Leadform',
+                    'lp_sidebarelemnts_section' => 'Detail Page Sidebar Widgets',
                 ),
                 'disabled' => array(
                     '' => '',
@@ -2436,59 +2490,6 @@ Redux::setSection($opt_name, array(
                 ),
             ),
         ),
-		//classic new style
-		array(
-            'id' => 'lp-detail-page-layout6-content',
-            'type' => 'sorter',
-            'title' => 'Content Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
-            'desc' => 'Shuffle elements within Listing Detail Content',
-            'compiler' => 'true',
-            'options' => array(
-                'general' => array(
-                    'lp_video_section' => 'Youtube Video',
-                    'lp_content_section' => 'Details',
-                    // New update 2.8                    // 'lp_openFields_section' => 'Listing Global Form Fields',
-                    // End New update 2.8
-                    'lp_features_section' => 'Listing Features',
-                    'lp_additional_section' => 'Additional Details',
-                    'lp_faqs_section' => 'FAQs',
-                    'lp_event_section' => 'Event',
-                    'lp_announcements_section' => 'Announcements',
-                    'lp_offers_section' => 'Offers/Discounts/Deals',
-                    'lp_menu_section' => 'Menu',
-                    'lp_reviews_section' => 'Reviews',
-                    'lp_reviewform_section' => 'Review Form',
-                ),
-                'disabled' => array(
-                    '' => '',
-                ),
-            ),
-        ),
-        array(
-            'id' => 'lp-detail-page-layout6-rsidebar',
-            'type' => 'sorter',
-            'title' => 'Sidebar Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
-            'desc' => 'Shuffle elements within Listing SideBar',
-            'compiler' => 'true',
-            'options' => array(
-                'sidebar' => array(
-                    'lp_mapsocial_section' => 'Map/Contacts',
-                    'lp_event_section' => 'Event',
-                    'lp_booking_section' => 'Appointments',
-                    'lp_timing_section' => 'Timings',
-                    'lp_quicks_section' => 'Quick Actions',
-                    'lp_additional_section' => 'Additional Details',
-                    'lp_offers_section' => 'Offers/Discounts/Deals',
-                    'lp_leadform_section' => 'Leadform',
-                    'lp_sidebarelemnts_section' => 'Detail Page Sidebar Widgets',
-                ),
-                'disabled' => array(
-                    '' => '',
-                ),
-            ),
-        ),
         array(
             'id' => 'lp_detail_page_additional_styles',
             'type' => 'button_set',
@@ -2505,7 +2506,7 @@ Redux::setSection($opt_name, array(
             'id' => 'lp_detail_page_video_display',
             'type' => 'button_set',
             'title' => esc_html__('Video Display Option', 'listingpro'),
-            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles6', 'lp_detail_page_styles1')), //classic new style
+            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles5', 'lp_detail_page_styles1')), //classic new style
             'subtitle' => esc_html__('On=Show youtube video in popup, off=embed', 'listingpro'),
             'options' => array(
                 'on' => 'On',
@@ -2549,7 +2550,7 @@ Redux::setSection($opt_name, array(
             'title' => esc_html__('Discount/Deals (sidebar)', 'listingpro'),
             'subtitle' => esc_html__('design for sidebar area', 'listingpro'),
             'desc' => esc_html__('The design used when deals show within the sidebar.', 'listingpro'),
-            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles4', 'lp_detail_page_styles3', 'lp_detail_page_styles2', 'lp_detail_page_styles1' , 'lp_detail_page_styles6')), //classic new style
+            'required' => array('lp_detail_page_styles', 'equals', array('lp_detail_page_styles4', 'lp_detail_page_styles3', 'lp_detail_page_styles2', 'lp_detail_page_styles1' , 'lp_detail_page_styles5')), //classic new style
             'options' => array(
                 '1' => array(
                     'alt' => 'Deals Design',

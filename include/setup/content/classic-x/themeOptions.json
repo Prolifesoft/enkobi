@@ -323,7 +323,7 @@
         "width": "",
         "thumbnail": ""
     },
-    "lp_detail_page_styles": "lp_detail_page_styles6",
+    "lp_detail_page_styles": "lp_detail_page_styles5",
     "lp-detail-page-layout5-content": {
         "general": {
             "placebo": "placebo",
@@ -334,6 +334,46 @@
             "lp_services_section": "Services",
             "lp_reviews_section": "Reviews",
             "lp_quote_section": "Quote Form"
+        },
+        "disabled": {
+            "placebo": "placebo",
+            "0": ""
+        }
+    },
+    "lp-detail-page-layout6-content": {
+        "general": {
+            "placebo": "placebo",
+            "lp_video_section": "Video",
+            "lp_content_section": "Details",
+            "lp_services_section": "Services",
+            "lp_gallery_section": "Resim",
+            "lp_features_section": "Listing Features",
+            "lp_additional_section": "Additional Details",
+            "lp_faqs_section": "FAQs",
+            "lp_event_section": "Event",
+            "lp_announcements_section": "Announcements",
+            "lp_offers_section": "Offers\/Discounts\/Deals",
+            "lp_menu_section": "Menu",
+            "lp_reviews_section": "Reviews",
+            "lp_reviewform_section": "Review Form"
+        },
+        "disabled": {
+            "placebo": "placebo",
+            "0": ""
+        }
+    },
+    "lp-detail-page-layout6-rsidebar": {
+        "sidebar": {
+            "placebo": "placebo",
+            "lp_mapsocial_section": "Map\/Contacts",
+            "lp_event_section": "Event",
+            "lp_booking_section": "Appointments",
+            "lp_timing_section": "Timings",
+            "lp_quicks_section": "Quick Actions",
+            "lp_additional_section": "Additional Details",
+            "lp_offers_section": "Offers\/Discounts\/Deals",
+            "lp_leadform_section": "Leadform",
+            "lp_sidebarelemnts_section": "Detail Page Sidebar Widgets"
         },
         "disabled": {
             "placebo": "placebo",
@@ -495,44 +535,6 @@
             "lp_event_section": "Event",
             "lp_offers_section": "Offers\/Discounts\/Deals",
             "lp_booking_section": "Appointments"
-        }
-    },
-    "lp-detail-page-layout6-content": {
-        "general": {
-            "placebo": "placebo",
-            "lp_video_section": "Youtube Video",
-            "lp_content_section": "Details",
-            "lp_features_section": "Listing Features",
-            "lp_additional_section": "Additional Details",
-            "lp_faqs_section": "FAQs",
-            "lp_reviews_section": "Reviews",
-            "lp_announcements_section": "Announcements",
-            "lp_reviewform_section": "Review Form",
-            "lp_event_section": "Event",
-            "lp_menu_section": "Menu",
-            "lp_offers_section": "Offers\/Discounts\/Deals"
-        },
-        "disabled": {
-            "placebo": "placebo",
-            "0": ""
-        }
-    },
-    "lp-detail-page-layout6-rsidebar": {
-        "sidebar": {
-            "placebo": "placebo",
-            "lp_timing_section": "Timings",
-            "lp_mapsocial_section": "Map\/Contacts",
-            "lp_additional_section": "Additional Details",
-            "lp_leadform_section": "Leadform",
-            "lp_booking_section": "Appointments",
-            "lp_quicks_section": "Quick Actions",
-            "lp_offers_section": "Offers\/Discounts\/Deals",
-            "lp_event_section": "Event",
-            "lp_sidebarelemnts_section": "Detail Page Sidebar Widgets"
-        },
-        "disabled": {
-            "placebo": "placebo",
-            "0": ""
         }
     },
     "lp_detail_page_additional_styles": "right",

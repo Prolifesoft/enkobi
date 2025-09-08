@@ -4,22 +4,52 @@ if ( have_posts() ) {
     while ( have_posts() ) {
         the_post();
         global $listingpro_options;
+
+        $layout_keys = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
+            ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
+            : array();
+        $layout_general = array();
+        foreach ( $layout_keys as $key ) {
+            if ( in_array( $key, array( 'lp_content_section', 'lp_video_section' ), true ) ) {
+                $layout_general[] = $key;
+            }
+        }
+        if ( ( $pos = array_search( 'lp_content_section', $layout_general, true ) ) !== false ) {
+            array_splice( $layout_general, $pos + 1, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+        } else {
+            array_splice( $layout_general, 0, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
+        }
+
         $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-        if ( listingpro_get_metabox( 'lp_listing_description' ) ) {
-            $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
-        }
         $services = listingpro_get_metabox( 'lp_services' );
-        if ( ! empty( $services ) ) {
-            $menu_items['services'] = __( 'Hizmetler', 'listingpro' );
+        $gallery  = listingpro_get_metabox( 'lp_gallery' );
+        $video    = listingpro_get_metabox( 'lp_video_embed' );
+
+        foreach ( $layout_general as $section_key ) {
+            switch ( $section_key ) {
+                case 'lp_content_section':
+                    if ( listingpro_get_metabox( 'lp_listing_description' ) ) {
+                        $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
+                    }
+                    break;
+                case 'lp_services_section':
+                    if ( ! empty( $services ) ) {
+                        $menu_items['services'] = __( 'Hizmetler', 'listingpro' );
+                    }
+                    break;
+                case 'lp_gallery_section':
+                    if ( ! empty( $gallery ) ) {
+                        $menu_items['gallery'] = __( 'Galeri', 'listingpro' );
+                    }
+                    break;
+                case 'lp_video_section':
+                    if ( ! empty( $video ) ) {
+                        $menu_items['video'] = __( 'Video', 'listingpro' );
+                    }
+                    break;
+            }
         }
-        $gallery = listingpro_get_metabox( 'lp_gallery' );
-        if ( ! empty( $gallery ) ) {
-            $menu_items['gallery'] = __( 'Galeri', 'listingpro' );
-        }
-        $video = listingpro_get_metabox( 'lp_video_embed' );
-        if ( ! empty( $video ) ) {
-            $menu_items['video'] = __( 'Video', 'listingpro' );
-        }
+
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
 
         $b_logo       = $listingpro_options['business_logo_switch'];
@@ -61,43 +91,52 @@ if ( have_posts() ) {
             <?php the_title('<h1 class="lp-listing-title">', '</h1>'); ?>
         </section>
 
-        <?php if ( isset( $menu_items['about'] ) ) : ?>
-        <section id="about" class="lp-section lp-section-about">
-            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-            <?php echo apply_filters( 'the_content', listingpro_get_metabox( 'lp_listing_description' ) ); ?>
-        </section>
-        <?php endif; ?>
-
-        <?php if ( isset( $menu_items['services'] ) ) : ?>
-        <section id="services" class="lp-section lp-section-services">
-            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
-            <?php echo apply_filters( 'the_content', $services ); ?>
-        </section>
-        <?php endif; ?>
-
-        <?php if ( isset( $menu_items['gallery'] ) ) : ?>
-        <section id="gallery" class="lp-section lp-section-gallery">
-            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-            <div class="lp-gallery-grid">
-            <?php
-            if ( is_array( $gallery ) ) {
-                foreach ( $gallery as $image_id ) {
-                    echo wp_get_attachment_image( $image_id, 'large' );
-                }
-            } else {
-                echo apply_filters( 'the_content', $gallery );
+        <?php foreach ( $layout_general as $section_key ) :
+            switch ( $section_key ) {
+                case 'lp_content_section':
+                    if ( isset( $menu_items['about'] ) ) : ?>
+                        <section id="about" class="lp-section lp-section-about">
+                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
+                            <?php echo apply_filters( 'the_content', listingpro_get_metabox( 'lp_listing_description' ) ); ?>
+                        </section>
+                    <?php endif;
+                    break;
+                case 'lp_services_section':
+                    if ( isset( $menu_items['services'] ) ) : ?>
+                        <section id="services" class="lp-section lp-section-services">
+                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
+                            <?php echo apply_filters( 'the_content', $services ); ?>
+                        </section>
+                    <?php endif;
+                    break;
+                case 'lp_gallery_section':
+                    if ( isset( $menu_items['gallery'] ) ) : ?>
+                        <section id="gallery" class="lp-section lp-section-gallery">
+                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
+                            <div class="lp-gallery-grid">
+                            <?php
+                            if ( is_array( $gallery ) ) {
+                                foreach ( $gallery as $image_id ) {
+                                    echo wp_get_attachment_image( $image_id, 'large' );
+                                }
+                            } else {
+                                echo apply_filters( 'the_content', $gallery );
+                            }
+                            ?>
+                            </div>
+                        </section>
+                    <?php endif;
+                    break;
+                case 'lp_video_section':
+                    if ( isset( $menu_items['video'] ) ) : ?>
+                        <section id="video" class="lp-section lp-section-video">
+                            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
+                            <?php echo apply_filters( 'the_content', $video ); ?>
+                        </section>
+                    <?php endif;
+                    break;
             }
-            ?>
-            </div>
-        </section>
-        <?php endif; ?>
-
-        <?php if ( isset( $menu_items['video'] ) ) : ?>
-        <section id="video" class="lp-section lp-section-video">
-            <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-            <?php echo apply_filters( 'the_content', $video ); ?>
-        </section>
-        <?php endif; ?>
+        endforeach; ?>
 
         <section id="contact" class="lp-section lp-section-contact">
             <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>

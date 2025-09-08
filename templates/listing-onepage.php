@@ -88,7 +88,12 @@ if ( have_posts() ) {
 
         $locations  = get_the_terms( get_the_ID(), 'location' );
         $categories = get_the_terms( get_the_ID(), 'listing-category' );
-        $price_html = function_exists( 'listingpro_price_dynesty' ) ? listingpro_price_dynesty( get_the_ID() ) : '';
+        $price_html = '';
+        if ( function_exists( 'listingpro_price_dynesty' ) ) {
+            ob_start();
+            listingpro_price_dynesty( get_the_ID() );
+            $price_html = ob_get_clean();
+        }
 
         $lp_title    = get_the_title();
         $tagline_text = lp_onepage_meta( 'tagline_text' );
@@ -194,7 +199,10 @@ if ( have_posts() ) {
         .lp-gallery-grid img{width:100%;height:auto;border-radius:4px;}
         #singlepostmap{width:100%;height:300px;border-radius:4px;}
         .lp-contact-list{list-style:none;margin:0;padding:0;}
-        .lp-contact-list li{margin-bottom:8px;}
+        .lp-contact-list li{margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+        .lp-contact-list i{width:16px;text-align:center;}
+        .lp-contact-list a{color:inherit;text-decoration:none;}
+        .lp-contact-list a:hover{text-decoration:underline;}
         .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;justify-content:center;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
@@ -348,21 +356,27 @@ if ( have_posts() ) {
             <div class="container">
                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
                 <ul class="lp-contact-list">
+                    <?php if ( ! empty( $locations ) && lp_onepage_on( $location_show ) ) : ?>
+                        <li class="lp-contact-location"><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li>
+                    <?php endif; ?>
                     <?php if ( lp_onepage_on( $location_show ) && ! empty( $address ) ) : ?>
-                        <li class="lp-contact-address"><?php echo esc_html( $address ); ?></li>
+                        <li class="lp-contact-address"><i class="fa fa-location-arrow"></i><?php echo esc_html( $address ); ?><?php if ( ! empty( $latitude ) && ! empty( $longitude ) ) : ?> <a href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank"><?php echo esc_html__( 'Yol Tarifi Al', 'listingpro' ); ?></a><?php endif; ?></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $contact_show ) && ! empty( $email ) ) : ?>
-                        <li class="lp-contact-email"><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
+                        <li class="lp-contact-email"><i class="fa fa-envelope"></i><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
-                        <li class="lp-contact-phone"><?php echo esc_html( $phone ); ?></li>
+                        <li class="lp-contact-phone"><i class="fa fa-phone"></i><a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $contact_show ) && ! empty( $whatsapp ) ) :
                         $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
-                        <li class="lp-contact-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
+                        <li class="lp-contact-whatsapp"><i class="fa fa-whatsapp"></i><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $website_show ) && ! empty( $website ) ) : ?>
-                        <li class="lp-contact-website"><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
+                        <li class="lp-contact-website"><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $price_html ) ) : ?>
+                        <li class="lp-contact-price"><?php echo $price_html; ?></li>
                     <?php endif; ?>
                 </ul>
                 <?php if ( lp_onepage_on( $social_show ) && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
@@ -373,9 +387,6 @@ if ( have_posts() ) {
                         <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa fa-youtube"></i></a></li><?php endif; ?>
                         <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa fa-instagram"></i></a></li><?php endif; ?>
                     </ul>
-                <?php endif; ?>
-                <?php if ( ! empty( $price_html ) ) : ?>
-                    <div class="lp-contact-price"><?php echo $price_html; ?></div>
                 <?php endif; ?>
                 <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>
             </div>

@@ -255,6 +255,23 @@ if ( have_posts() ) {
                 </div>
             </div>
         </section>
+        <?php if ( ! empty( $locations ) || ! empty( $categories ) || ! empty( $price_html ) ) : ?>
+        <div class="lp-home-meta-wrap">
+            <div class="container">
+                <ul class="lp-home-meta">
+                    <?php if ( ! empty( $locations ) ) : ?>
+                        <li><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $categories ) ) : ?>
+                        <li><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $price_html ) ) : ?>
+                        <li><?php echo $price_html; ?></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {

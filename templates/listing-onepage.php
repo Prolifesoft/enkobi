@@ -24,24 +24,9 @@ if ( have_posts() ) {
             }
         }
 
-        $layout_keys = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
+        $layout_general = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
-            : array();
-        $layout_general = array();
-        foreach ( $layout_keys as $key ) {
-            if ( in_array( $key, array( 'lp_content_section', 'lp_video_section' ), true ) ) {
-                $layout_general[] = $key;
-            }
-        }
-        if ( empty( $layout_general ) ) {
-            $layout_general = array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section' );
-        } else {
-            if ( ( $pos = array_search( 'lp_content_section', $layout_general, true ) ) !== false ) {
-                array_splice( $layout_general, $pos + 1, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
-            } else {
-                array_splice( $layout_general, 0, 0, array( 'lp_services_section', 'lp_gallery_section' ) );
-            }
-        }
+            : array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_faqs_section' );
 
         $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
         $description = lp_onepage_meta( 'lp_listing_description' );
@@ -51,23 +36,31 @@ if ( have_posts() ) {
         $services = wp_get_post_terms( get_the_ID(), 'features' );
         $gallery_ids = get_post_meta( get_the_ID(), 'gallery_image_ids', true );
         $gallery_ids = ! empty( $gallery_ids ) ? array_filter( explode( ',', $gallery_ids ) ) : array();
-        $video = lp_onepage_meta_by_id( 'video', get_the_ID() );
+        $video      = lp_onepage_meta_by_id( 'video', get_the_ID() );
         if ( empty( $video ) ) {
             $video = lp_onepage_meta( 'lp_video_embed' );
+        }
+        $video_html = '';
+        if ( ! empty( $video ) ) {
+            $video_html = wp_oembed_get( $video );
+            if ( false === $video_html ) {
+                $video_html = $video;
+            }
         }
 
         $plan_id = lp_onepage_meta_by_id( 'Plan_id', get_the_ID() );
         if ( empty( $plan_id ) ) {
             $plan_id = 'none';
         }
-        $map_show    = get_post_meta( $plan_id, 'map_show', true );
-        $social_show = get_post_meta( $plan_id, 'listingproc_social', true );
+        $map_show      = get_post_meta( $plan_id, 'map_show', true );
+        $social_show   = get_post_meta( $plan_id, 'listingproc_social', true );
         $location_show = get_post_meta( $plan_id, 'listingproc_location', true );
-        $contact_show = get_post_meta( $plan_id, 'contact_show', true );
-        $website_show = get_post_meta( $plan_id, 'listingproc_website', true );
-        $hours_show   = get_post_meta( $plan_id, 'listingproc_bhours', true );
+        $contact_show  = get_post_meta( $plan_id, 'contact_show', true );
+        $website_show  = get_post_meta( $plan_id, 'listingproc_website', true );
+        $hours_show    = get_post_meta( $plan_id, 'listingproc_bhours', true );
+        $faqs_show     = get_post_meta( $plan_id, 'listingproc_faq', true );
         if ( 'none' === $plan_id ) {
-            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = 'true';
+            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = $faqs_show = 'true';
         }
 
         $address   = lp_onepage_meta( 'gAddress' );
@@ -78,6 +71,7 @@ if ( have_posts() ) {
         $latitude  = lp_onepage_meta( 'latitude' );
         $longitude = lp_onepage_meta( 'longitude' );
         $hours     = lp_onepage_meta( 'business_hours' );
+        $faqs      = lp_onepage_meta_by_id( 'faqs', get_the_ID() );
 
         $facebook  = lp_onepage_meta( 'facebook' );
         $twitter   = lp_onepage_meta( 'twitter' );
@@ -143,8 +137,13 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_video_section':
-                    if ( ! empty( $video ) ) {
+                    if ( ! empty( $video_html ) ) {
                         $menu_items['video'] = __( 'Video', 'listingpro' );
+                    }
+                    break;
+                case 'lp_faqs_section':
+                    if ( 'true' === $faqs_show && ! empty( $faqs ) && ! empty( $faqs['faq'][1] ) ) {
+                        $menu_items['faq'] = __( 'SSS', 'listingpro' );
                     }
                     break;
             }
@@ -153,7 +152,11 @@ if ( have_posts() ) {
         if ( 'true' === $map_show && ! empty( $latitude ) && ! empty( $longitude ) ) {
             $menu_items['map'] = __( 'Harita', 'listingpro' );
         }
-        if ( 'true' === $hours_show && ! empty( $hours ) ) {
+        $has_hours = ! empty( $hours );
+        if ( is_array( $hours ) ) {
+            $has_hours = ! empty( array_filter( $hours ) );
+        }
+        if ( 'true' === $hours_show && $has_hours ) {
             $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
         }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
@@ -170,7 +173,9 @@ if ( have_posts() ) {
         <style>
         .lp-onepage-header{position:sticky;top:0;background:#fff;z-index:999;border-bottom:1px solid #eee;}
         .lp-onepage-header-inner{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:15px 0;}
-        .lp-onepage-logo img{max-height:80px;width:auto;}
+        .lp-onepage-brand{display:flex;align-items:center;gap:15px;}
+        .lp-onepage-logo img{width:60px;height:60px;border-radius:50%;object-fit:cover;}
+        .lp-onepage-name{font-weight:700;font-size:20px;}
         .lp-onepage-nav ul{list-style:none;margin:0;padding:0;display:flex;gap:30px;}
         .lp-onepage-nav a{text-decoration:none;color:#333;font-weight:600;}
         .lp-onepage-nav a:hover{color:#0073aa;}
@@ -191,11 +196,14 @@ if ( have_posts() ) {
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
             <div class="container lp-onepage-header-inner">
+            <div class="lp-onepage-brand">
             <?php if ( ! empty( $business_logo_url ) ) : ?>
                 <div class="lp-onepage-logo"><img src="<?php echo esc_attr( $business_logo_url ); ?>" alt="<?php esc_attr_e( 'Listing Logo', 'listingpro' ); ?>"></div>
             <?php else : ?>
-                <div class="lp-onepage-logo"><?php the_post_thumbnail( 'medium' ); ?></div>
+                <div class="lp-onepage-logo"><?php the_post_thumbnail( 'thumbnail' ); ?></div>
             <?php endif; ?>
+            <span class="lp-onepage-name"><?php echo esc_html( $lp_title ); ?></span>
+            </div>
             <nav class="lp-onepage-nav">
                 <ul>
                     <?php foreach ( $menu_items as $slug => $label ) : ?>
@@ -275,7 +283,19 @@ if ( have_posts() ) {
                         <section id="video" class="lp-section lp-section-video">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-                                <?php echo apply_filters( 'the_content', (string) $video ); ?>
+                                <?php echo wp_kses_post( $video_html ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_faqs_section':
+                    if ( isset( $menu_items['faq'] ) ) {
+                        ?>
+                        <section id="faq" class="lp-section lp-section-faq">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['faq'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style4/content/list-faq' ); ?>
                             </div>
                         </section>
                         <?php
@@ -327,11 +347,11 @@ if ( have_posts() ) {
                 </ul>
                 <?php if ( 'true' === $social_show && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>
                     <ul class="lp-social-list">
-                        <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa-brands fa-square-facebook"></i></a></li><?php endif; ?>
-                        <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a></li><?php endif; ?>
-                        <?php if ( ! empty( $linkedin ) ) : ?><li><a href="<?php echo esc_url( $linkedin ); ?>" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li><?php endif; ?>
-                        <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa-brands fa-youtube"></i></a></li><?php endif; ?>
-                        <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa-brands fa-square-instagram"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $facebook ) ) : ?><li><a href="<?php echo esc_url( $facebook ); ?>" target="_blank"><i class="fa fa-facebook-square"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $twitter ) ) : ?><li><a href="<?php echo esc_url( $twitter ); ?>" target="_blank"><i class="fa fa-twitter"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $linkedin ) ) : ?><li><a href="<?php echo esc_url( $linkedin ); ?>" target="_blank"><i class="fa fa-linkedin"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $youtube ) ) : ?><li><a href="<?php echo esc_url( $youtube ); ?>" target="_blank"><i class="fa fa-youtube"></i></a></li><?php endif; ?>
+                        <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa fa-instagram"></i></a></li><?php endif; ?>
                     </ul>
                 <?php endif; ?>
             </div>

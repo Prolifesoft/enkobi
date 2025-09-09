@@ -75,6 +75,10 @@ if ( have_posts() ) {
         $website   = lp_onepage_meta( 'website' );
         $email     = lp_onepage_meta( 'email' );
         $whatsapp  = lp_onepage_meta( 'whatsapp' );
+        $wa_link   = '';
+        if ( ! empty( $whatsapp ) ) {
+            $wa_link = 'https://api.whatsapp.com/send?phone=' . preg_replace( '/\D+/', '', $whatsapp );
+        }
         $latitude  = lp_onepage_meta( 'latitude' );
         $longitude = lp_onepage_meta( 'longitude' );
         $hours     = lp_onepage_meta( 'business_hours' );
@@ -211,6 +215,7 @@ if ( have_posts() ) {
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
         .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;justify-content:center;}
         .lp-home-meta li{display:flex;align-items:center;gap:5px;}
+        .lp-whatsapp-float{position:fixed;right:20px;bottom:20px;width:50px;height:50px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:1000;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -228,11 +233,10 @@ if ( have_posts() ) {
                     <?php foreach ( $menu_items as $slug => $label ) : ?>
                         <li><a href="#<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></a></li>
                     <?php endforeach; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
+                    <?php if ( ! empty( $phone ) ) : ?>
                         <li class="lp-nav-phone"><a href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i><?php echo esc_html( $phone ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $whatsapp ) ) :
-                        $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
+                    <?php if ( ! empty( $whatsapp ) ) : ?>
                         <li class="lp-nav-whatsapp"><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><i class="fa fa-whatsapp"></i><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
                 </ul>
@@ -381,17 +385,19 @@ if ( have_posts() ) {
                     <?php if ( ! empty( $locations ) && lp_onepage_on( $location_show ) ) : ?>
                         <li class="lp-contact-location"><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li>
                     <?php endif; ?>
+                    <?php if ( ! empty( $categories ) ) : ?>
+                        <li class="lp-contact-category"><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li>
+                    <?php endif; ?>
                     <?php if ( lp_onepage_on( $location_show ) && ! empty( $address ) ) : ?>
                         <li class="lp-contact-address"><i class="fa fa-location-arrow"></i><?php echo esc_html( $address ); ?><?php if ( ! empty( $latitude ) && ! empty( $longitude ) ) : ?> <a href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank"><?php echo esc_html__( 'Yol Tarifi Al', 'listingpro' ); ?></a><?php endif; ?></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $contact_show ) && 'yes' === $email_switcher && ! empty( $email ) ) : ?>
                         <li class="lp-contact-email"><i class="fa fa-envelope"></i><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
+                    <?php if ( ! empty( $phone ) ) : ?>
                         <li class="lp-contact-phone"><i class="fa fa-phone"></i><a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $whatsapp ) ) :
-                        $wa_link = 'https://api.whatsapp.com/send?phone=' . $whatsapp; ?>
+                    <?php if ( ! empty( $whatsapp ) ) : ?>
                         <li class="lp-contact-whatsapp"><i class="fa fa-whatsapp"></i><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $website_show ) && ! empty( $website ) ) : ?>
@@ -419,6 +425,9 @@ if ( have_posts() ) {
                 <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>
             </div>
         </section>
+        <?php if ( ! empty( $wa_link ) ) : ?>
+            <a class="lp-whatsapp-float" href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><i class="fa fa-whatsapp"></i></a>
+        <?php endif; ?>
 
         <script>
         jQuery(function($){

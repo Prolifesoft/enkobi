@@ -79,6 +79,7 @@ if ( have_posts() ) {
         $longitude = lp_onepage_meta( 'longitude' );
         $hours     = lp_onepage_meta( 'business_hours' );
         $faqs      = lp_onepage_meta_by_id( 'faqs', get_the_ID() );
+        $email_switcher = function_exists( 'lp_theme_option' ) ? lp_theme_option( 'listingpro_email_display_switch' ) : 'yes';
 
         $facebook  = lp_onepage_meta( 'facebook' );
         $twitter   = lp_onepage_meta( 'twitter' );
@@ -197,6 +198,8 @@ if ( have_posts() ) {
         .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
         .lp-gallery-item{flex:1 1 calc(33.333% - 10px);}
         .lp-gallery-grid img{width:100%;height:auto;border-radius:4px;}
+        .lp-video-wrapper{position:relative;padding-bottom:73.5%;height:0;overflow:hidden;}
+        .lp-video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;}
         #singlepostmap{width:100%;height:300px;border-radius:4px;}
         .lp-contact-list{list-style:none;margin:0;padding:0;}
         .lp-contact-list li{margin-bottom:8px;display:flex;align-items:center;gap:8px;}
@@ -328,7 +331,9 @@ if ( have_posts() ) {
                         <section id="video" class="lp-section lp-section-video">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
+                                <div class="lp-video-wrapper">
                                 <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true ) ) ) ); ?>
+                                </div>
                             </div>
                         </section>
                         <?php
@@ -379,7 +384,7 @@ if ( have_posts() ) {
                     <?php if ( lp_onepage_on( $location_show ) && ! empty( $address ) ) : ?>
                         <li class="lp-contact-address"><i class="fa fa-location-arrow"></i><?php echo esc_html( $address ); ?><?php if ( ! empty( $latitude ) && ! empty( $longitude ) ) : ?> <a href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank"><?php echo esc_html__( 'Yol Tarifi Al', 'listingpro' ); ?></a><?php endif; ?></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && ! empty( $email ) ) : ?>
+                    <?php if ( lp_onepage_on( $contact_show ) && 'yes' === $email_switcher && ! empty( $email ) ) : ?>
                         <li class="lp-contact-email"><i class="fa fa-envelope"></i><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $contact_show ) && ! empty( $phone ) ) : ?>
@@ -405,6 +410,12 @@ if ( have_posts() ) {
                         <?php if ( ! empty( $instagram ) ) : ?><li><a href="<?php echo esc_url( $instagram ); ?>" target="_blank"><i class="fa fa-instagram"></i></a></li><?php endif; ?>
                     </ul>
                 <?php endif; ?>
+                <?php
+                $additional_pos = isset( $listingpro_options['lp_detail_page_additional_styles'] ) ? $listingpro_options['lp_detail_page_additional_styles'] : '';
+                if ( function_exists( 'listing_all_extra_fields_v2_right' ) && 'right' === $additional_pos ) {
+                    listing_all_extra_fields_v2_right( get_the_ID() );
+                }
+                ?>
                 <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>
             </div>
         </section>

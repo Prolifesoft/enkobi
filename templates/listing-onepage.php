@@ -66,8 +66,10 @@ if ( have_posts() ) {
         $website_show  = get_post_meta( $plan_id, 'listingproc_website', true );
         $hours_show    = get_post_meta( $plan_id, 'listingproc_bhours', true );
         $faqs_show     = get_post_meta( $plan_id, 'listingproc_faq', true );
+        $price_show    = get_post_meta( $plan_id, 'listingproc_price', true );
+        $tags_show     = get_post_meta( $plan_id, 'listingproc_tag_key', true );
         if ( 'none' === $plan_id ) {
-            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = $faqs_show = 'true';
+            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = $faqs_show = $price_show = $tags_show = 'true';
         }
 
         $address   = lp_onepage_meta( 'gAddress' );
@@ -84,6 +86,8 @@ if ( have_posts() ) {
         $hours     = lp_onepage_meta( 'business_hours' );
         $faqs      = lp_onepage_meta_by_id( 'faqs', get_the_ID() );
         $email_switcher = function_exists( 'lp_theme_option' ) ? lp_theme_option( 'listingpro_email_display_switch' ) : 'yes';
+
+        $tags_terms = get_the_terms( get_the_ID(), 'list-tags' );
 
         $facebook  = lp_onepage_meta( 'facebook' );
         $twitter   = lp_onepage_meta( 'twitter' );
@@ -135,6 +139,19 @@ if ( have_posts() ) {
             $rating_num_clr = 'level4';
         }
         $resurva_url = get_post_meta( get_the_ID(), 'resurva_url', true );
+        $post_author_id = get_post_field( 'post_author', get_the_ID() );
+        $menuOption = false;
+        $menuMeta = get_post_meta( get_the_ID(), 'menu_listing', true );
+        if ( ! empty( $menuMeta ) ) {
+            $menuOption = true;
+        }
+        $timekit = false;
+        $timekit_booking = get_post_meta( get_the_ID(), 'timekit_bookings', true );
+        if ( ! empty( $timekit_booking ) ) {
+            $timekit = true;
+        }
+        $announcements_raw = get_post_meta( get_the_ID(), 'lp_listing_announcements', true );
+        $has_announcements = is_array( $announcements_raw ) && count( $announcements_raw ) > 0;
 
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
@@ -161,6 +178,39 @@ if ( have_posts() ) {
                 case 'lp_faqs_section':
                     if ( lp_onepage_on( $faqs_show ) && ! empty( $faqs ) && ! empty( $faqs['faq'][1] ) ) {
                         $menu_items['faq'] = __( 'SSS', 'listingpro' );
+                    }
+                    break;
+                case 'lp_announcements_section':
+                    if ( $has_announcements ) {
+                        $menu_items['announcements'] = __( 'Duyurular', 'listingpro' );
+                    }
+                    break;
+                case 'lp_offers_section':
+                    $menu_items['offers'] = __( 'Fırsatlar', 'listingpro' );
+                    break;
+                case 'lp_menu_section':
+                    if ( $menuOption ) {
+                        $menu_items['menu'] = __( 'Menü', 'listingpro' );
+                    }
+                    break;
+                case 'lp_event_section':
+                    $menu_items['event'] = __( 'Etkinlikler', 'listingpro' );
+                    break;
+                case 'lp_reviews_section':
+                    $menu_items['reviews'] = __( 'Yorumlar', 'listingpro' );
+                    break;
+                case 'lp_reviewform_section':
+                    $menu_items['reviewform'] = __( 'Yorum Yaz', 'listingpro' );
+                    break;
+                case 'lp_features_section':
+                    $menu_items['features'] = __( 'Özellikler', 'listingpro' );
+                    break;
+                case 'lp_additional_section':
+                    $menu_items['additional'] = __( 'Ek Bilgiler', 'listingpro' );
+                    break;
+                case 'lp_booking_section':
+                    if ( $timekit || ! empty( $resurva_url ) || class_exists( 'Listingpro_bookings' ) ) {
+                        $menu_items['booking'] = __( 'Randevu', 'listingpro' );
                     }
                     break;
             }
@@ -355,6 +405,134 @@ if ( have_posts() ) {
                         <?php
                     }
                     break;
+                case 'lp_announcements_section':
+                    if ( isset( $menu_items['announcements'] ) ) {
+                        ?>
+                        <section id="announcements" class="lp-section lp-section-announcements">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['announcements'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-announcements' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_offers_section':
+                    if ( isset( $menu_items['offers'] ) ) {
+                        ?>
+                        <section id="offers" class="lp-section lp-section-offers">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['offers'] ); ?></h2>
+                                <?php
+                                $post_author_id = get_post_field( 'post_author', get_the_ID() );
+                                $discount_displayin = get_user_meta( $post_author_id, 'discount_display_area', true );
+                                if ( $discount_displayin == 'content' || empty( $discount_displayin ) ) {
+                                    get_template_part( 'templates/single-list/listing-details-style6/content/list-offer-deals-discount' );
+                                }
+                                ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_menu_section':
+                    if ( isset( $menu_items['menu'] ) ) {
+                        ?>
+                        <section id="menu" class="lp-section lp-section-menu">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['menu'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-menu' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_event_section':
+                    if ( isset( $menu_items['event'] ) ) {
+                        ?>
+                        <section id="event" class="lp-section lp-section-event">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['event'] ); ?></h2>
+                                <?php $GLOBALS['event_grid_call'] = 'content_area'; get_template_part( 'templates/single-list/event' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_reviews_section':
+                    if ( isset( $menu_items['reviews'] ) ) {
+                        ?>
+                        <section id="reviews" class="lp-section lp-section-reviews">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['reviews'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/reviews' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_reviewform_section':
+                    if ( isset( $menu_items['reviewform'] ) ) {
+                        ?>
+                        <section id="reviewform" class="lp-section lp-section-reviewform">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['reviewform'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/reviewform' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_features_section':
+                    if ( isset( $menu_items['features'] ) ) {
+                        ?>
+                        <section id="features" class="lp-section lp-section-features">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['features'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/features' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_additional_section':
+                    if ( isset( $menu_items['additional'] ) ) {
+                        ?>
+                        <section id="additional" class="lp-section lp-section-additional">
+                            <div class="container">
+                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['additional'] ); ?></h2>
+                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/additional' ); ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_booking_section':
+                    if ( isset( $menu_items['booking'] ) ) {
+                        ?>
+                        <section id="booking" class="lp-section lp-section-booking">
+                            <div class="container">
+                                <?php
+                                if ( class_exists( 'Listingpro_bookings' ) ) {
+                                    include WP_CONTENT_DIR . '/plugins/listingpro-bookings/templates/bookings.php';
+                                } elseif ( ! empty( $resurva_url ) ) {
+                                    echo '<iframe src="' . esc_url( $resurva_url ) . '" frameborder="0" style="width:100%;height:600px"></iframe>';
+                                }
+                                ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
+                    break;
+                case 'lp_quicks_section':
+                    ?>
+                    <section id="quicks" class="lp-section lp-section-quicks">
+                        <div class="container">
+                            <?php get_template_part( 'templates/single-list/listing-details-style6/sidebar/quicks' ); ?>
+                        </div>
+                    </section>
+                    <?php
+                    break;
             }
         }
         ?>
@@ -403,8 +581,11 @@ if ( have_posts() ) {
                     <?php if ( lp_onepage_on( $website_show ) && ! empty( $website ) ) : ?>
                         <li class="lp-contact-website"><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( ! empty( $price_html ) ) : ?>
+                    <?php if ( lp_onepage_on( $price_show ) && ! empty( $price_html ) ) : ?>
                         <li class="lp-contact-price"><?php echo $price_html; ?></li>
+                    <?php endif; ?>
+                    <?php if ( lp_onepage_on( $tags_show ) && ! empty( $tags_terms ) ) : ?>
+                        <li class="lp-contact-tags"><i class="fa fa-tags"></i><?php echo esc_html( join( ', ', wp_list_pluck( $tags_terms, 'name' ) ) ); ?></li>
                     <?php endif; ?>
                 </ul>
                 <?php if ( lp_onepage_on( $social_show ) && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>

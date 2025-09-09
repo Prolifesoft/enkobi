@@ -2236,6 +2236,8 @@ Redux::setSection($opt_name, array(
                     'lp_announcements_section' => 'Announcements',
                     'lp_offers_section' => 'Offers/Discounts/Deals',
                     'lp_menu_section' => 'Menu',
+                    'lp_booking_section' => 'Appointments',
+                    'lp_quicks_section' => 'Quick Actions',
                     'lp_reviews_section' => 'Reviews',
                     'lp_reviewform_section' => 'Review Form',
                 ),

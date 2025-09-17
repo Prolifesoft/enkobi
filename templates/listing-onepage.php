@@ -68,8 +68,9 @@ if ( have_posts() ) {
         $faqs_show     = get_post_meta( $plan_id, 'listingproc_faq', true );
         $price_show    = get_post_meta( $plan_id, 'listingproc_price', true );
         $tags_show     = get_post_meta( $plan_id, 'listingproc_tag_key', true );
+        $gallery_show  = get_post_meta( $plan_id, 'gallery_show', true );
         if ( 'none' === $plan_id ) {
-            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = $faqs_show = $price_show = $tags_show = 'true';
+            $map_show = $social_show = $location_show = $contact_show = $website_show = $hours_show = $faqs_show = $price_show = $tags_show = $gallery_show = 'true';
         }
 
         $address   = lp_onepage_meta( 'gAddress' );
@@ -99,9 +100,7 @@ if ( have_posts() ) {
         $categories = get_the_terms( get_the_ID(), 'listing-category' );
         $price_html = '';
         if ( function_exists( 'listingpro_price_dynesty' ) ) {
-            ob_start();
-            listingpro_price_dynesty( get_the_ID() );
-            $price_html = ob_get_clean();
+            $price_html = listingpro_price_dynesty( get_the_ID() );
         }
 
         $lp_title    = get_the_title();
@@ -166,7 +165,7 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_gallery_section':
-                    if ( ! empty( $gallery_ids ) ) {
+                    if ( lp_onepage_on( $gallery_show ) && ! empty( $gallery_ids ) ) {
                         $menu_items['gallery'] = __( 'Resim', 'listingpro' );
                     }
                     break;
@@ -249,9 +248,10 @@ if ( have_posts() ) {
         .lp-section{padding:60px 0;}
         .lp-section .container{max-width:1170px;margin:0 auto;}
         .lp-section-title{margin:0 0 30px;font-size:28px;font-weight:700;text-align:center;}
-        .lp-gallery-grid{display:flex;flex-wrap:wrap;gap:15px;}
-        .lp-gallery-item{flex:1 1 calc(33.333% - 10px);}
-        .lp-gallery-grid img{width:100%;height:auto;border-radius:4px;}
+        .lp-onepage-gallery-slider{position:relative;}
+        .lp-onepage-gallery-slider .listing-slide2,
+        .lp-onepage-gallery-slider .listing-slide{margin:0;}
+        .lp-onepage-gallery-slider .slide img{width:100%;height:auto;border-radius:4px;}
         .lp-video-wrapper{position:relative;padding-bottom:73.5%;height:0;overflow:hidden;}
         .lp-video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;}
         #singlepostmap{width:100%;height:300px;border-radius:4px;}
@@ -323,7 +323,7 @@ if ( have_posts() ) {
                         <li><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li>
                     <?php endif; ?>
                     <?php if ( ! empty( $price_html ) ) : ?>
-                        <li><?php echo $price_html; ?></li>
+                        <li><?php echo wp_kses_post( $price_html ); ?></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -366,14 +366,46 @@ if ( have_posts() ) {
                         <section id="gallery" class="lp-section lp-section-gallery">
                             <div class="container">
                                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                                <div class="lp-gallery-grid">
-                                <?php foreach ( $gallery_ids as $image_id ) :
-                                    $img_full = wp_get_attachment_image_src( $image_id, 'full' );
-                                    if ( $img_full ) : ?>
-                                        <div class="lp-gallery-item"><img src="<?php echo esc_url( $img_full[0] ); ?>" alt="<?php echo esc_attr( $lp_title ); ?>"></div>
-                                    <?php endif;
-                                endforeach; ?>
-                                </div>
+                                <?php
+                                $lp_detail_slider_styles = isset( $listingpro_options['lp_detail_slider_styles'] ) ? $listingpro_options['lp_detail_slider_styles'] : 'style1';
+                                $imgIDs                 = $gallery_ids;
+                                $numImages              = $num_gallery;
+                                if ( ! empty( $imgIDs ) && $numImages >= 1 ) :
+                                    if ( file_exists( THEME_PATH . '/include/aq_resizer.php' ) ) {
+                                        require_once THEME_PATH . '/include/aq_resizer.php';
+                                    }
+                                    ?>
+                                    <div class="pos-relative lp-onepage-gallery-slider">
+                                        <div class="spinner">
+                                            <div class="double-bounce1"></div>
+                                            <div class="double-bounce2"></div>
+                                        </div>
+                                        <div class="single-page-slider-container <?php echo esc_attr( $lp_detail_slider_styles ); ?>">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="<?php echo ( 'style2' === $lp_detail_slider_styles ) ? 'listing-slide' : 'listing-slide2'; ?> img_<?php echo esc_attr( $numImages ); ?>" data-images-num="<?php echo esc_attr( $numImages ); ?>">
+                                                        <?php
+                                                        foreach ( $imgIDs as $imgID ) {
+                                                            $img_url  = wp_get_attachment_image_src( $imgID, 'full' );
+                                                            $img_full = $img_url ? $img_url[0] : '';
+                                                            $img_src  = $img_full;
+                                                            if ( ! empty( $img_full ) && function_exists( 'aq_resize' ) ) {
+                                                                $resized = aq_resize( $img_full, 770, 566, true, true, true );
+                                                                if ( ! empty( $resized ) ) {
+                                                                    $img_src = $resized;
+                                                                }
+                                                            }
+                                                            if ( ! empty( $img_full ) ) {
+                                                                echo '<div class="slide"><a href="' . esc_url( $img_full ) . '" rel="prettyPhoto[gallery1]"><img src="' . esc_url( $img_src ) . '" alt="' . esc_attr( $lp_title ) . '" /></a></div>';
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </section>
                         <?php
@@ -582,10 +614,17 @@ if ( have_posts() ) {
                         <li class="lp-contact-website"><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $price_show ) && ! empty( $price_html ) ) : ?>
-                        <li class="lp-contact-price"><?php echo $price_html; ?></li>
+                        <li class="lp-contact-price"><?php echo wp_kses_post( $price_html ); ?></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $tags_show ) && ! empty( $tags_terms ) ) : ?>
-                        <li class="lp-contact-tags"><i class="fa fa-tags"></i><?php echo esc_html( join( ', ', wp_list_pluck( $tags_terms, 'name' ) ) ); ?></li>
+                    <?php if ( lp_onepage_on( $tags_show ) && ! empty( $tags_terms ) ) :
+                        $tag_names = array();
+                        foreach ( $tags_terms as $tag_term ) {
+                            $tag_names[] = $tag_term->name;
+                        }
+                        $tag_names = array_filter( $tag_names );
+                        if ( ! empty( $tag_names ) ) : ?>
+                        <li class="lp-contact-tags"><i class="fa fa-tags"></i><?php echo esc_html( implode( ', ', $tag_names ) ); ?></li>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </ul>
                 <?php if ( lp_onepage_on( $social_show ) && ( $facebook || $twitter || $linkedin || $youtube || $instagram ) ) : ?>

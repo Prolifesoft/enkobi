@@ -397,6 +397,20 @@ if ( have_posts() ) {
                 continue;
             }
             switch ( $section_key ) {
+                case 'lp_additional_section':
+                    if ( function_exists( 'listing_all_extra_fields' ) ) {
+                        $additional_html = listing_all_extra_fields( get_the_ID() );
+                        if ( ! empty( $additional_html ) ) {
+                            ?>
+                            <section id="additional" class="lp-section lp-section-additional">
+                                <div class="container">
+                                    <?php echo $additional_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                </div>
+                            </section>
+                            <?php
+                        }
+                    }
+                    break;
                 case 'lp_faqs_section':
                     if ( lp_onepage_on( $faqs_show ) && $has_faq ) {
                         ?>
@@ -419,6 +433,24 @@ if ( have_posts() ) {
                             </div>
                         </section>
                         <?php
+                    }
+                    break;
+                case 'lp_offers_section':
+                    $post_author_id      = get_post_field( 'post_author', get_the_ID() );
+                    $discount_displayin = get_user_meta( $post_author_id, 'discount_display_area', true );
+                    if ( 'content' === $discount_displayin || empty( $discount_displayin ) ) {
+                        ob_start();
+                        get_template_part( 'templates/single-list/listing-details-style6/content/list-offer-deals-discount' );
+                        $offers_html = trim( ob_get_clean() );
+                        if ( '' !== trim( wp_strip_all_tags( $offers_html ) ) ) {
+                            ?>
+                            <section id="offers" class="lp-section lp-section-offers">
+                                <div class="container">
+                                    <?php echo $offers_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                </div>
+                            </section>
+                            <?php
+                        }
                     }
                     break;
                 case 'lp_menu_section':
@@ -450,6 +482,26 @@ if ( have_posts() ) {
                         <?php
                     }
                     break;
+                case 'lp_event_section':
+                    $post_author_id = get_post_field( 'post_author', get_the_ID() );
+                    $event_displayin = get_user_meta( $post_author_id, 'event_display_area', true );
+                    if ( 'content' === $event_displayin || empty( $event_displayin ) ) {
+                        $GLOBALS['event_grid_call'] = 'content_area';
+                        ob_start();
+                        get_template_part( 'templates/single-list/event' );
+                        $events_html = trim( ob_get_clean() );
+                        unset( $GLOBALS['event_grid_call'] );
+                        if ( '' !== trim( wp_strip_all_tags( $events_html ) ) ) {
+                            ?>
+                            <section id="events" class="lp-section lp-section-events">
+                                <div class="container">
+                                    <?php echo $events_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                </div>
+                            </section>
+                            <?php
+                        }
+                    }
+                    break;
                 case 'lp_quicks_section':
                     ?>
                     <section id="quicks" class="lp-section lp-section-quicks">
@@ -458,6 +510,20 @@ if ( have_posts() ) {
                         </div>
                     </section>
                     <?php
+                    break;
+                case 'lp_reviewform_section':
+                    ob_start();
+                    get_template_part( 'templates/single-list/listing-details-style6/content/reviewform' );
+                    $review_form_html = trim( ob_get_clean() );
+                    if ( '' !== trim( wp_strip_all_tags( $review_form_html ) ) ) {
+                        ?>
+                        <section id="review-form" class="lp-section lp-section-reviewform">
+                            <div class="container">
+                                <?php echo $review_form_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                            </div>
+                        </section>
+                        <?php
+                    }
                     break;
             }
         }

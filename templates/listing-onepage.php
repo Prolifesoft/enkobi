@@ -38,14 +38,11 @@ if ( have_posts() ) {
                 }
 
                 ob_start();
-                $include_result = include $template_path;
-                $html_output    = ob_get_clean();
 
-                if ( false === $include_result ) {
-                    return '';
-                }
+                global $post;
+                include $template_path;
 
-                return trim( $html_output );
+                return trim( ob_get_clean() );
             }
         }
 
@@ -679,7 +676,6 @@ if ( have_posts() ) {
         <?php foreach ( $sections_markup as $section_html ) : ?>
             <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         <?php endforeach; ?>
-        ?>
 
         <?php if ( $has_map ) :
             $lp_map_pin = $listingpro_options['lp_map_pin']['url']; ?>

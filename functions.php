@@ -239,13 +239,18 @@ if (!function_exists('listingpro_style')) {
 		wp_enqueue_style('bootstrapslider', THEME_DIR . '/assets/lib/bootstrap/css/bootstrap-slider.css');
 		//}
 
-		wp_enqueue_style('mourisjs', THEME_DIR . '/assets/css/morris.css');
+                wp_enqueue_style('mourisjs', THEME_DIR . '/assets/css/morris.css');
 
-		wp_enqueue_style('listingpro', STYLESHEET_DIR . '/style.css');
-		$mobile_view = lp_theme_option('single_listing_mobile_view');
-		if ($mobile_view == 'app_view2' && wp_is_mobile()) {
-			wp_enqueue_style('app-view2-styles', THEME_DIR . '/assets/css/app-view2.css');
-		}
+                wp_enqueue_style('listingpro', STYLESHEET_DIR . '/style.css');
+
+                $lp_detail_page_styles = isset($listingpro_options['lp_detail_page_styles']) ? $listingpro_options['lp_detail_page_styles'] : '';
+                if (is_singular('listing') && $lp_detail_page_styles == 'lp_detail_page_styles7') {
+                        wp_enqueue_style('listing-onepage', THEME_DIR . '/assets/css/listing-onepage.css');
+                }
+                $mobile_view = lp_theme_option('single_listing_mobile_view');
+                if ($mobile_view == 'app_view2' && wp_is_mobile()) {
+                        wp_enqueue_style('app-view2-styles', THEME_DIR . '/assets/css/app-view2.css');
+                }
 		if (is_rtl()) {
 			wp_enqueue_style('lp-rtl', THEME_DIR . '/assets/css/rtl.css');
 		}

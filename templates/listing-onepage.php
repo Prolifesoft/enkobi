@@ -33,7 +33,7 @@ if ( have_posts() ) {
         </header>
 
         <section id="home" class="lp-section lp-section-home">
-            <?php the_title('<h1 class="lp-listing-title">', '</h1>'); ?>
+            <?php the_title('<h1 class="lp-onepage-title">', '</h1>'); ?>
         </section>
 
         <?php if ( isset( $menu_items['about'] ) ) : ?>
@@ -79,8 +79,9 @@ if ( have_posts() ) {
             $('.lp-onepage-nav a').on('click', function(e){
                 e.preventDefault();
                 var target = this.hash;
+                var headerHeight = $('.lp-onepage-header').outerHeight() || 0;
                 $('html, body').animate({
-                    scrollTop: $(target).offset().top
+                    scrollTop: $(target).offset().top - headerHeight
                 }, 500);
             });
         });

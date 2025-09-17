@@ -174,69 +174,33 @@ if ( have_posts() ) {
         $announcements_raw = get_post_meta( get_the_ID(), 'lp_listing_announcements', true );
         $has_announcements = is_array( $announcements_raw ) && count( $announcements_raw ) > 0;
 
-        foreach ( $layout_general as $section_key ) {
-            switch ( $section_key ) {
-                case 'lp_content_section':
-                    if ( ! empty( $description ) ) {
-                        $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
-                    }
-                    break;
-                case 'lp_services_section':
-                    if ( ! empty( $service_names ) ) {
-                        $menu_items['services'] = __( 'Hizmetler', 'listingpro' );
-                    }
-                    break;
-                case 'lp_gallery_section':
-                    if ( lp_onepage_on( $gallery_show ) && ! empty( $gallery_ids ) ) {
-                        $menu_items['gallery'] = __( 'Resim', 'listingpro' );
-                    }
-                    break;
-                case 'lp_video_section':
-                    if ( ! empty( $video_html ) ) {
-                        $menu_items['video'] = __( 'Video', 'listingpro' );
-                    }
-                    break;
-                case 'lp_faqs_section':
-                    if ( lp_onepage_on( $faqs_show ) && $has_faq ) {
-                        $menu_items['faq'] = __( 'SSS', 'listingpro' );
-                    }
-                    break;
-                case 'lp_announcements_section':
-                    if ( $has_announcements ) {
-                        $menu_items['announcements'] = __( 'Duyurular', 'listingpro' );
-                    }
-                    break;
-                case 'lp_menu_section':
-                    if ( $menuOption ) {
-                        $menu_items['menu'] = __( 'Menü', 'listingpro' );
-                    }
-                    break;
-                case 'lp_event_section':
-                    $menu_items['event'] = __( 'Etkinlikler', 'listingpro' );
-                    break;
-                case 'lp_reviews_section':
-                    $menu_items['reviews'] = __( 'Yorumlar', 'listingpro' );
-                    break;
-                case 'lp_features_section':
-                    $menu_items['features'] = __( 'Özellikler', 'listingpro' );
-                    break;
-                case 'lp_booking_section':
-                    if ( $timekit || ! empty( $resurva_url ) || class_exists( 'Listingpro_bookings' ) ) {
-                        $menu_items['booking'] = __( 'Randevu', 'listingpro' );
-                    }
-                    break;
-            }
-        }
+        $enabled_sections = array_flip( $layout_general );
 
-        if ( lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude ) ) {
-            $menu_items['map'] = __( 'Harita', 'listingpro' );
+        $has_about    = isset( $enabled_sections['lp_content_section'] ) && ! empty( $description );
+        $has_services = isset( $enabled_sections['lp_services_section'] ) && ! empty( $service_names );
+        $has_features = isset( $enabled_sections['lp_features_section'] ) && ! empty( $service_names );
+        $has_features_section = $has_features || $has_services;
+        $has_gallery  = isset( $enabled_sections['lp_gallery_section'] ) && lp_onepage_on( $gallery_show ) && ! empty( $gallery_ids );
+        $has_video    = isset( $enabled_sections['lp_video_section'] ) && ! empty( $video_html );
+        $has_reviews  = isset( $enabled_sections['lp_reviews_section'] );
+        $has_map      = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
+        $has_hours    = lp_onepage_on( $hours_show ) && ( is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours ) );
+
+        $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
+        if ( $has_about ) {
+            $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
         }
-        $has_hours = ! empty( $hours );
-        if ( is_array( $hours ) ) {
-            $has_hours = ! empty( array_filter( $hours ) );
+        if ( $has_features_section ) {
+            $menu_items['features'] = __( 'Özellikler', 'listingpro' );
         }
-        if ( lp_onepage_on( $hours_show ) && $has_hours ) {
-            $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
+        if ( $has_gallery ) {
+            $menu_items['gallery'] = __( 'Resim', 'listingpro' );
+        }
+        if ( $has_video ) {
+            $menu_items['video'] = __( 'Video', 'listingpro' );
+        }
+        if ( $has_reviews ) {
+            $menu_items['reviews'] = __( 'Yorumlar', 'listingpro' );
         }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
 
@@ -352,84 +316,93 @@ if ( have_posts() ) {
         </div>
         <?php endif; ?>
 
-        <?php foreach ( $layout_general as $section_key ) {
+        <?php if ( $has_about ) : ?>
+            <section id="about" class="lp-section lp-section-about">
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
+                    <?php echo apply_filters( 'the_content', $description ); ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php if ( $has_features_section ) : ?>
+            <section id="features" class="lp-section lp-section-features">
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['features'] ); ?></h2>
+                    <?php
+                    if ( $has_features ) {
+                        get_template_part( 'templates/single-list/listing-details-style6/content/features' );
+                    } elseif ( $has_services ) {
+                        ?>
+                        <ul class="lp-services-list">
+                            <?php foreach ( $service_names as $service_name ) : ?>
+                                <li><?php echo esc_html( $service_name ); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php if ( $has_gallery ) : ?>
+            <section id="gallery" class="lp-section lp-section-gallery">
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
+                    <?php if ( ! empty( $gallery_ids ) ) : ?>
+                        <div class="lp-gallery-grid">
+                            <?php
+                            foreach ( $gallery_ids as $img_id ) {
+                                $full = wp_get_attachment_image_src( $img_id, 'full' );
+                                if ( empty( $full[0] ) ) {
+                                    continue;
+                                }
+                                $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-thumb' ) );
+                                if ( empty( $thumb ) ) {
+                                    $thumb = '<img class="lp-gallery-thumb" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( $lp_title ) . '" />';
+                                }
+                                echo '<a class="lp-gallery-item" href="' . esc_url( $full[0] ) . '" rel="prettyPhoto[gallery1]">' . $thumb . '</a>';
+                            }
+                            ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php if ( $has_video ) : ?>
+            <section id="video" class="lp-section lp-section-video">
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
+                    <div class="lp-video-wrapper">
+                        <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true ) ) ) ); ?>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php if ( $has_reviews ) : ?>
+            <section id="reviews" class="lp-section lp-section-reviews">
+                <div class="container">
+                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['reviews'] ); ?></h2>
+                    <?php get_template_part( 'templates/single-list/listing-details-style6/content/reviews' ); ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php
+        foreach ( $layout_general as $section_key ) {
+            if ( in_array( $section_key, array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_reviews_section', 'lp_features_section' ), true ) ) {
+                continue;
+            }
             switch ( $section_key ) {
-                case 'lp_content_section':
-                    if ( isset( $menu_items['about'] ) ) {
-                        ?>
-                        <section id="about" class="lp-section lp-section-about">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-                                <?php echo apply_filters( 'the_content', $description ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_services_section':
-                    if ( isset( $menu_items['services'] ) ) {
-                        ?>
-                        <section id="services" class="lp-section lp-section-services">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['services'] ); ?></h2>
-                                <ul class="lp-services-list">
-                                <?php foreach ( $service_names as $service_name ) : ?>
-                                    <li><?php echo esc_html( $service_name ); ?></li>
-                                <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_gallery_section':
-                    if ( isset( $menu_items['gallery'] ) ) {
-                        ?>
-                        <section id="gallery" class="lp-section lp-section-gallery">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                                <?php if ( ! empty( $gallery_ids ) ) : ?>
-                                    <div class="lp-gallery-grid">
-                                        <?php
-                                        foreach ( $gallery_ids as $img_id ) {
-                                            $full = wp_get_attachment_image_src( $img_id, 'full' );
-                                            if ( empty( $full[0] ) ) {
-                                                continue;
-                                            }
-                                            $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-thumb' ) );
-                                            if ( empty( $thumb ) ) {
-                                                $thumb = '<img class="lp-gallery-thumb" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( $lp_title ) . '" />';
-                                            }
-                                            echo '<a class="lp-gallery-item" href="' . esc_url( $full[0] ) . '" rel="prettyPhoto[gallery1]">' . $thumb . '</a>';
-                                        }
-                                        ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_video_section':
-                    if ( isset( $menu_items['video'] ) ) {
-                        ?>
-                        <section id="video" class="lp-section lp-section-video">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-                                <div class="lp-video-wrapper">
-                                <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true ) ) ) ); ?>
-                                </div>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
                 case 'lp_faqs_section':
-                    if ( isset( $menu_items['faq'] ) ) {
+                    if ( lp_onepage_on( $faqs_show ) && $has_faq ) {
                         ?>
                         <section id="faq" class="lp-section lp-section-faq">
                             <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['faq'] ); ?></h2>
+                                <h2 class="lp-section-title"><?php echo esc_html__( 'SSS', 'listingpro' ); ?></h2>
                                 <?php get_template_part( 'templates/single-list/listing-details-style4/content/list-faq' ); ?>
                             </div>
                         </section>
@@ -437,11 +410,11 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_announcements_section':
-                    if ( isset( $menu_items['announcements'] ) ) {
+                    if ( $has_announcements ) {
                         ?>
                         <section id="announcements" class="lp-section lp-section-announcements">
                             <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['announcements'] ); ?></h2>
+                                <h2 class="lp-section-title"><?php echo esc_html__( 'Duyurular', 'listingpro' ); ?></h2>
                                 <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-announcements' ); ?>
                             </div>
                         </section>
@@ -449,55 +422,19 @@ if ( have_posts() ) {
                     }
                     break;
                 case 'lp_menu_section':
-                    if ( isset( $menu_items['menu'] ) ) {
+                    if ( $menuOption ) {
                         ?>
                         <section id="menu" class="lp-section lp-section-menu">
                             <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['menu'] ); ?></h2>
+                                <h2 class="lp-section-title"><?php echo esc_html__( 'Menü', 'listingpro' ); ?></h2>
                                 <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-menu' ); ?>
                             </div>
                         </section>
                         <?php
                     }
                     break;
-                case 'lp_event_section':
-                    if ( isset( $menu_items['event'] ) ) {
-                        ?>
-                        <section id="event" class="lp-section lp-section-event">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['event'] ); ?></h2>
-                                <?php $GLOBALS['event_grid_call'] = 'content_area'; get_template_part( 'templates/single-list/event' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_reviews_section':
-                    if ( isset( $menu_items['reviews'] ) ) {
-                        ?>
-                        <section id="reviews" class="lp-section lp-section-reviews">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['reviews'] ); ?></h2>
-                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/reviews' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_features_section':
-                    if ( isset( $menu_items['features'] ) ) {
-                        ?>
-                        <section id="features" class="lp-section lp-section-features">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html( $menu_items['features'] ); ?></h2>
-                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/features' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
                 case 'lp_booking_section':
-                    if ( isset( $menu_items['booking'] ) ) {
+                    if ( $timekit || ! empty( $resurva_url ) || class_exists( 'Listingpro_bookings' ) ) {
                         ?>
                         <section id="booking" class="lp-section lp-section-booking">
                             <div class="container">
@@ -526,20 +463,20 @@ if ( have_posts() ) {
         }
         ?>
 
-        <?php if ( isset( $menu_items['map'] ) ) :
+        <?php if ( $has_map ) :
             $lp_map_pin = $listingpro_options['lp_map_pin']['url']; ?>
             <section id="map" class="lp-section lp-section-map">
                 <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['map'] ); ?></h2>
+                    <h2 class="lp-section-title"><?php echo esc_html__( 'Harita', 'listingpro' ); ?></h2>
                     <div id="singlepostmap" class="singlemap" data-lat="<?php echo esc_attr( $latitude ); ?>" data-lan="<?php echo esc_attr( $longitude ); ?>" data-pinicon="<?php echo esc_attr( $lp_map_pin ); ?>"></div>
                 </div>
             </section>
         <?php endif; ?>
 
-        <?php if ( isset( $menu_items['hours'] ) ) : ?>
+        <?php if ( $has_hours ) : ?>
             <section id="hours" class="lp-section lp-section-hours">
                 <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['hours'] ); ?></h2>
+                    <h2 class="lp-section-title"><?php echo esc_html__( 'Çalışma Saatleri', 'listingpro' ); ?></h2>
                     <?php get_template_part( 'include/timings' ); ?>
                 </div>
             </section>

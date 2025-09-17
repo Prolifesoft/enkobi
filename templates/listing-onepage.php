@@ -30,11 +30,29 @@ if ( have_posts() ) {
             }
         }
 
+        if ( ! function_exists( 'lp_onepage_capture' ) ) {
+            function lp_onepage_capture( $template ) {
+                $template_path = locate_template( $template, false, false );
+                if ( empty( $template_path ) ) {
+                    return '';
+                }
+
+                ob_start();
+                $include_result = include $template_path;
+                $html_output    = ob_get_clean();
+
+                if ( false === $include_result ) {
+                    return '';
+                }
+
+                return trim( $html_output );
+            }
+        }
+
         $layout_general = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
             : array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_faqs_section' );
 
-        $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
         $description = lp_onepage_meta( 'lp_listing_description' );
         if ( empty( $description ) ) {
             $description = get_post_field( 'post_content', get_the_ID() );
@@ -176,32 +194,368 @@ if ( have_posts() ) {
 
         $enabled_sections = array_flip( $layout_general );
 
-        $has_about    = isset( $enabled_sections['lp_content_section'] ) && ! empty( $description );
-        $has_services = isset( $enabled_sections['lp_services_section'] ) && ! empty( $service_names );
-        $has_features = isset( $enabled_sections['lp_features_section'] ) && ! empty( $service_names );
-        $has_features_section = $has_features || $has_services;
-        $has_gallery  = isset( $enabled_sections['lp_gallery_section'] ) && lp_onepage_on( $gallery_show ) && ! empty( $gallery_ids );
-        $has_video    = isset( $enabled_sections['lp_video_section'] ) && ! empty( $video_html );
-        $has_reviews  = isset( $enabled_sections['lp_reviews_section'] );
-        $has_map      = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
-        $has_hours    = lp_onepage_on( $hours_show ) && ( is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours ) );
+        $has_map   = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
+        $has_hours = lp_onepage_on( $hours_show ) && ( is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours ) );
 
-        $menu_items = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-        if ( $has_about ) {
-            $menu_items['about'] = __( 'Hakkımızda', 'listingpro' );
+        $sections_markup = array();
+        $menu_items      = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
+
+        foreach ( $layout_general as $section_key ) {
+            switch ( $section_key ) {
+                case 'lp_content_section':
+                    if ( empty( $description ) || isset( $sections_markup['about'] ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="about" class="lp-section lp-section-about">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Hakkımızda', 'listingpro' ); ?></h2>
+                            <?php echo apply_filters( 'the_content', $description ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['about'] = ob_get_clean();
+                    $menu_items['about']      = __( 'Hakkımızda', 'listingpro' );
+                    break;
+
+                case 'lp_services_section':
+                    if ( empty( $service_names ) || isset( $sections_markup['services'] ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="services" class="lp-section lp-section-services">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Hizmetler', 'listingpro' ); ?></h2>
+                            <ul class="lp-services-list">
+                                <?php foreach ( $service_names as $service_name ) : ?>
+                                    <li><?php echo esc_html( $service_name ); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['services'] = ob_get_clean();
+                    $menu_items['services']      = __( 'Hizmetler', 'listingpro' );
+                    break;
+
+                case 'lp_features_section':
+                    if ( isset( $sections_markup['features'] ) ) {
+                        break;
+                    }
+                    $features_html = lp_onepage_capture( 'templates/single-list/listing-details-style6/content/features.php' );
+                    if ( empty( $features_html ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="features" class="lp-section lp-section-features">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Özellikler', 'listingpro' ); ?></h2>
+                            <?php echo $features_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['features'] = ob_get_clean();
+                    $menu_items['features']      = __( 'Özellikler', 'listingpro' );
+                    break;
+
+                case 'lp_gallery_section':
+                    if ( ! lp_onepage_on( $gallery_show ) || empty( $gallery_ids ) || isset( $sections_markup['gallery'] ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="gallery" class="lp-section lp-section-gallery">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Resim', 'listingpro' ); ?></h2>
+                            <div class="lp-gallery-grid">
+                                <?php foreach ( $gallery_ids as $img_id ) :
+                                    $full = wp_get_attachment_image_src( $img_id, 'full' );
+                                    if ( empty( $full[0] ) ) {
+                                        continue;
+                                    }
+                                    $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-thumb' ) );
+                                    if ( empty( $thumb ) ) {
+                                        $thumb = '<img class="lp-gallery-thumb" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( $lp_title ) . '" />';
+                                    }
+                                    ?>
+                                    <a class="lp-gallery-item" href="<?php echo esc_url( $full[0] ); ?>" rel="prettyPhoto[gallery1]">
+                                        <?php echo $thumb; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['gallery'] = ob_get_clean();
+                    $menu_items['gallery']      = __( 'Resim', 'listingpro' );
+                    break;
+
+                case 'lp_video_section':
+                    if ( empty( $video_html ) || isset( $sections_markup['video'] ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="video" class="lp-section lp-section-video">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Video', 'listingpro' ); ?></h2>
+                            <div class="lp-video-wrapper">
+                                <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array(
+                                    'src' => true,
+                                    'width' => true,
+                                    'height' => true,
+                                    'frameborder' => true,
+                                    'allowfullscreen' => true,
+                                ) ) ) ); ?>
+                            </div>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['video'] = ob_get_clean();
+                    $menu_items['video']      = __( 'Video', 'listingpro' );
+                    break;
+
+                case 'lp_additional_section':
+                    if ( isset( $sections_markup['additional'] ) ) {
+                        break;
+                    }
+                    $additional_html = '';
+                    if ( function_exists( 'listing_all_extra_fields' ) ) {
+                        $additional_html = listing_all_extra_fields( get_the_ID() );
+                    }
+                    if ( empty( $additional_html ) && function_exists( 'listing_all_extra_fields_v2' ) ) {
+                        $additional_html = listing_all_extra_fields_v2( get_the_ID() );
+                    }
+                    if ( empty( $additional_html ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="additional" class="lp-section lp-section-additional">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Ek Bilgiler', 'listingpro' ); ?></h2>
+                            <?php echo $additional_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['additional'] = ob_get_clean();
+                    $menu_items['additional']      = __( 'Ek Bilgiler', 'listingpro' );
+                    break;
+
+                case 'lp_faqs_section':
+                    if ( ! lp_onepage_on( $faqs_show ) || ! $has_faq || isset( $sections_markup['faq'] ) ) {
+                        break;
+                    }
+                    $faq_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/list-faq.php' );
+                    if ( empty( $faq_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="faq" class="lp-section lp-section-faq">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'SSS', 'listingpro' ); ?></h2>
+                            <?php echo $faq_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['faq'] = ob_get_clean();
+                    $menu_items['faq']      = __( 'SSS', 'listingpro' );
+                    break;
+
+                case 'lp_announcements_section':
+                    if ( isset( $sections_markup['announcements'] ) ) {
+                        break;
+                    }
+                    $announcements_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/list-announcements.php' );
+                    if ( empty( $announcements_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="announcements" class="lp-section lp-section-announcements">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Duyurular', 'listingpro' ); ?></h2>
+                            <?php echo $announcements_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['announcements'] = ob_get_clean();
+                    $menu_items['announcements']      = __( 'Duyurular', 'listingpro' );
+                    break;
+
+                case 'lp_offers_section':
+                    if ( isset( $sections_markup['offers'] ) ) {
+                        break;
+                    }
+                    $offers_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/list-offer-deals-discount.php' );
+                    if ( empty( $offers_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="offers" class="lp-section lp-section-offers">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Fırsatlar', 'listingpro' ); ?></h2>
+                            <?php echo $offers_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['offers'] = ob_get_clean();
+                    $menu_items['offers']      = __( 'Fırsatlar', 'listingpro' );
+                    break;
+
+                case 'lp_menu_section':
+                    if ( isset( $sections_markup['menu'] ) ) {
+                        break;
+                    }
+                    $menu_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/list-menu.php' );
+                    if ( empty( $menu_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="menu" class="lp-section lp-section-menu">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Menü', 'listingpro' ); ?></h2>
+                            <?php echo $menu_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['menu'] = ob_get_clean();
+                    $menu_items['menu']      = __( 'Menü', 'listingpro' );
+                    break;
+
+                case 'lp_event_section':
+                    if ( isset( $sections_markup['events'] ) ) {
+                        break;
+                    }
+                    $event_displayin = get_user_meta( $post_author_id, 'event_display_area', true );
+                    if ( ! empty( $event_displayin ) && 'content' !== $event_displayin ) {
+                        break;
+                    }
+                    $GLOBALS['event_grid_call'] = 'content_area';
+                    $events_markup              = lp_onepage_capture( 'templates/single-list/event.php' );
+                    unset( $GLOBALS['event_grid_call'] );
+                    if ( empty( $events_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="events" class="lp-section lp-section-events">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Etkinlikler', 'listingpro' ); ?></h2>
+                            <?php echo $events_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['events'] = ob_get_clean();
+                    $menu_items['events']      = __( 'Etkinlikler', 'listingpro' );
+                    break;
+
+                case 'lp_booking_section':
+                    if ( isset( $sections_markup['booking'] ) ) {
+                        break;
+                    }
+                    $booking_markup = '';
+                    if ( class_exists( 'Listingpro_bookings' ) ) {
+                        $booking_template = WP_CONTENT_DIR . '/plugins/listingpro-bookings/templates/bookings.php';
+                        if ( file_exists( $booking_template ) ) {
+                            ob_start();
+                            include $booking_template;
+                            $booking_markup = trim( ob_get_clean() );
+                        }
+                    } elseif ( ! empty( $resurva_url ) ) {
+                        $booking_markup = '<iframe src="' . esc_url( $resurva_url ) . '" frameborder="0" style="width:100%;height:600px"></iframe>';
+                    } elseif ( ! empty( $timekit_booking ) ) {
+                        $booking_markup = $timekit_booking;
+                    }
+
+                    if ( empty( $booking_markup ) ) {
+                        break;
+                    }
+
+                    ob_start();
+                    ?>
+                    <section id="booking" class="lp-section lp-section-booking">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Randevu', 'listingpro' ); ?></h2>
+                            <?php echo $booking_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['booking'] = ob_get_clean();
+                    $menu_items['booking']      = __( 'Randevu', 'listingpro' );
+                    break;
+
+                case 'lp_quicks_section':
+                    if ( isset( $sections_markup['quick'] ) ) {
+                        break;
+                    }
+                    $quicks_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/sidebar/quicks.php' );
+                    if ( empty( $quicks_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="quick" class="lp-section lp-section-quick">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Hızlı İşlemler', 'listingpro' ); ?></h2>
+                            <?php echo $quicks_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['quick'] = ob_get_clean();
+                    $menu_items['quick']      = __( 'Hızlı İşlemler', 'listingpro' );
+                    break;
+
+                case 'lp_reviews_section':
+                    if ( isset( $sections_markup['reviews'] ) ) {
+                        break;
+                    }
+                    $reviews_markup = lp_onepage_capture( 'templates/single-list/listing-details-style6/content/reviews.php' );
+                    if ( empty( $reviews_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="reviews" class="lp-section lp-section-reviews">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Yorumlar', 'listingpro' ); ?></h2>
+                            <?php echo $reviews_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['reviews'] = ob_get_clean();
+                    $menu_items['reviews']      = __( 'Yorumlar', 'listingpro' );
+                    break;
+
+                case 'lp_reviewform_section':
+                    if ( isset( $sections_markup['reviewform'] ) ) {
+                        break;
+                    }
+                    $reviewform_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/list-review-form.php' );
+                    if ( empty( $reviewform_markup ) ) {
+                        break;
+                    }
+                    ob_start();
+                    ?>
+                    <section id="reviewform" class="lp-section lp-section-reviewform">
+                        <div class="container">
+                            <h2 class="lp-section-title"><?php echo esc_html__( 'Yorum Yaz', 'listingpro' ); ?></h2>
+                            <?php echo $reviewform_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                        </div>
+                    </section>
+                    <?php
+                    $sections_markup['reviewform'] = ob_get_clean();
+                    $menu_items['reviewform']      = __( 'Yorum Yaz', 'listingpro' );
+                    break;
+            }
         }
-        if ( $has_features_section ) {
-            $menu_items['features'] = __( 'Özellikler', 'listingpro' );
-        }
-        if ( $has_gallery ) {
-            $menu_items['gallery'] = __( 'Resim', 'listingpro' );
-        }
-        if ( $has_video ) {
-            $menu_items['video'] = __( 'Video', 'listingpro' );
-        }
-        if ( $has_reviews ) {
-            $menu_items['reviews'] = __( 'Yorumlar', 'listingpro' );
-        }
+
         if ( $has_map ) {
             $menu_items['map'] = __( 'Harita', 'listingpro' );
         }
@@ -322,217 +676,9 @@ if ( have_posts() ) {
         </div>
         <?php endif; ?>
 
-        <?php if ( $has_about ) : ?>
-            <section id="about" class="lp-section lp-section-about">
-                <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['about'] ); ?></h2>
-                    <?php echo apply_filters( 'the_content', $description ); ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <?php if ( $has_features_section ) : ?>
-            <section id="features" class="lp-section lp-section-features">
-                <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['features'] ); ?></h2>
-                    <?php
-                    if ( $has_features ) {
-                        get_template_part( 'templates/single-list/listing-details-style6/content/features' );
-                    } elseif ( $has_services ) {
-                        ?>
-                        <ul class="lp-services-list">
-                            <?php foreach ( $service_names as $service_name ) : ?>
-                                <li><?php echo esc_html( $service_name ); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <?php
-                    }
-                    ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <?php if ( $has_gallery ) : ?>
-            <section id="gallery" class="lp-section lp-section-gallery">
-                <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['gallery'] ); ?></h2>
-                    <?php if ( ! empty( $gallery_ids ) ) : ?>
-                        <div class="lp-gallery-grid">
-                            <?php
-                            foreach ( $gallery_ids as $img_id ) {
-                                $full = wp_get_attachment_image_src( $img_id, 'full' );
-                                if ( empty( $full[0] ) ) {
-                                    continue;
-                                }
-                                $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-thumb' ) );
-                                if ( empty( $thumb ) ) {
-                                    $thumb = '<img class="lp-gallery-thumb" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( $lp_title ) . '" />';
-                                }
-                                echo '<a class="lp-gallery-item" href="' . esc_url( $full[0] ) . '" rel="prettyPhoto[gallery1]">' . $thumb . '</a>';
-                            }
-                            ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <?php if ( $has_video ) : ?>
-            <section id="video" class="lp-section lp-section-video">
-                <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['video'] ); ?></h2>
-                    <div class="lp-video-wrapper">
-                        <?php echo wp_kses( $video_html, array_merge( wp_kses_allowed_html( 'post' ), array( 'iframe' => array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true ) ) ) ); ?>
-                    </div>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <?php if ( $has_reviews ) : ?>
-            <section id="reviews" class="lp-section lp-section-reviews">
-                <div class="container">
-                    <h2 class="lp-section-title"><?php echo esc_html( $menu_items['reviews'] ); ?></h2>
-                    <?php get_template_part( 'templates/single-list/listing-details-style6/content/reviews' ); ?>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <?php
-        foreach ( $layout_general as $section_key ) {
-            if ( in_array( $section_key, array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_reviews_section', 'lp_features_section' ), true ) ) {
-                continue;
-            }
-            switch ( $section_key ) {
-                case 'lp_additional_section':
-                    if ( function_exists( 'listing_all_extra_fields' ) ) {
-                        $additional_html = listing_all_extra_fields( get_the_ID() );
-                        if ( ! empty( $additional_html ) ) {
-                            ?>
-                            <section id="additional" class="lp-section lp-section-additional">
-                                <div class="container">
-                                    <?php echo $additional_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                </div>
-                            </section>
-                            <?php
-                        }
-                    }
-                    break;
-                case 'lp_faqs_section':
-                    if ( lp_onepage_on( $faqs_show ) && $has_faq ) {
-                        ?>
-                        <section id="faq" class="lp-section lp-section-faq">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html__( 'SSS', 'listingpro' ); ?></h2>
-                                <?php get_template_part( 'templates/single-list/listing-details-style4/content/list-faq' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_announcements_section':
-                    if ( $has_announcements ) {
-                        ?>
-                        <section id="announcements" class="lp-section lp-section-announcements">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html__( 'Duyurular', 'listingpro' ); ?></h2>
-                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-announcements' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_offers_section':
-                    $post_author_id      = get_post_field( 'post_author', get_the_ID() );
-                    $discount_displayin = get_user_meta( $post_author_id, 'discount_display_area', true );
-                    if ( 'content' === $discount_displayin || empty( $discount_displayin ) ) {
-                        ob_start();
-                        get_template_part( 'templates/single-list/listing-details-style6/content/list-offer-deals-discount' );
-                        $offers_html = trim( ob_get_clean() );
-                        if ( '' !== trim( wp_strip_all_tags( $offers_html ) ) ) {
-                            ?>
-                            <section id="offers" class="lp-section lp-section-offers">
-                                <div class="container">
-                                    <?php echo $offers_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                </div>
-                            </section>
-                            <?php
-                        }
-                    }
-                    break;
-                case 'lp_menu_section':
-                    if ( $menuOption ) {
-                        ?>
-                        <section id="menu" class="lp-section lp-section-menu">
-                            <div class="container">
-                                <h2 class="lp-section-title"><?php echo esc_html__( 'Menü', 'listingpro' ); ?></h2>
-                                <?php get_template_part( 'templates/single-list/listing-details-style6/content/list-menu' ); ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_booking_section':
-                    if ( $timekit || ! empty( $resurva_url ) || class_exists( 'Listingpro_bookings' ) ) {
-                        ?>
-                        <section id="booking" class="lp-section lp-section-booking">
-                            <div class="container">
-                                <?php
-                                if ( class_exists( 'Listingpro_bookings' ) ) {
-                                    include WP_CONTENT_DIR . '/plugins/listingpro-bookings/templates/bookings.php';
-                                } elseif ( ! empty( $resurva_url ) ) {
-                                    echo '<iframe src="' . esc_url( $resurva_url ) . '" frameborder="0" style="width:100%;height:600px"></iframe>';
-                                }
-                                ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-                case 'lp_event_section':
-                    $post_author_id = get_post_field( 'post_author', get_the_ID() );
-                    $event_displayin = get_user_meta( $post_author_id, 'event_display_area', true );
-                    if ( 'content' === $event_displayin || empty( $event_displayin ) ) {
-                        $GLOBALS['event_grid_call'] = 'content_area';
-                        ob_start();
-                        get_template_part( 'templates/single-list/event' );
-                        $events_html = trim( ob_get_clean() );
-                        unset( $GLOBALS['event_grid_call'] );
-                        if ( '' !== trim( wp_strip_all_tags( $events_html ) ) ) {
-                            ?>
-                            <section id="events" class="lp-section lp-section-events">
-                                <div class="container">
-                                    <?php echo $events_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                </div>
-                            </section>
-                            <?php
-                        }
-                    }
-                    break;
-                case 'lp_quicks_section':
-                    ?>
-                    <section id="quicks" class="lp-section lp-section-quicks">
-                        <div class="container">
-                            <?php get_template_part( 'templates/single-list/listing-details-style6/sidebar/quicks' ); ?>
-                        </div>
-                    </section>
-                    <?php
-                    break;
-                case 'lp_reviewform_section':
-                    ob_start();
-                    get_template_part( 'templates/single-list/listing-details-style6/content/reviewform' );
-                    $review_form_html = trim( ob_get_clean() );
-                    if ( '' !== trim( wp_strip_all_tags( $review_form_html ) ) ) {
-                        ?>
-                        <section id="review-form" class="lp-section lp-section-reviewform">
-                            <div class="container">
-                                <?php echo $review_form_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                            </div>
-                        </section>
-                        <?php
-                    }
-                    break;
-            }
-        }
+        <?php foreach ( $sections_markup as $section_html ) : ?>
+            <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        <?php endforeach; ?>
         ?>
 
         <?php if ( $has_map ) :

@@ -202,6 +202,12 @@ if ( have_posts() ) {
         if ( $has_reviews ) {
             $menu_items['reviews'] = __( 'Yorumlar', 'listingpro' );
         }
+        if ( $has_map ) {
+            $menu_items['map'] = __( 'Harita', 'listingpro' );
+        }
+        if ( $has_hours ) {
+            $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
+        }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
 
         $b_logo       = $listingpro_options['business_logo_switch'];

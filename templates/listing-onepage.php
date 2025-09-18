@@ -53,9 +53,23 @@ if ( have_posts() ) {
             }
         }
 
-        $layout_general = isset( $listingpro_options['lp-detail-page-layout6-content']['general'] )
-            ? array_keys( $listingpro_options['lp-detail-page-layout6-content']['general'] )
-            : array( 'lp_content_section', 'lp_services_section', 'lp_gallery_section', 'lp_video_section', 'lp_faqs_section' );
+        $layout_general = array(
+            'lp_content_section',
+            'lp_services_section',
+            'lp_features_section',
+            'lp_gallery_section',
+            'lp_video_section',
+            'lp_announcements_section',
+            'lp_offers_section',
+            'lp_menu_section',
+            'lp_event_section',
+            'lp_booking_section',
+            'lp_quicks_section',
+            'lp_faqs_section',
+            'lp_additional_section',
+            'lp_reviews_section',
+            'lp_reviewform_section',
+        );
 
         $description = lp_onepage_meta( 'lp_listing_description' );
         if ( empty( $description ) ) {
@@ -195,8 +209,6 @@ if ( have_posts() ) {
         }
         $announcements_raw = get_post_meta( get_the_ID(), 'lp_listing_announcements', true );
         $has_announcements = is_array( $announcements_raw ) && count( $announcements_raw ) > 0;
-
-        $enabled_sections = array_flip( $layout_general );
 
         $has_map   = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
         $has_hours = is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours );

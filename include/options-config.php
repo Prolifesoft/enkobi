@@ -2214,62 +2214,6 @@ Redux::setSection($opt_name, array(
                 ),
             ),
         ),
-        array(
-            'id' => 'lp-detail-page-layout6-content',
-            'type' => 'sorter',
-            'title' => 'Content Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
-            'desc' => 'Shuffle elements within Listing Detail Content',
-            'compiler' => 'true',
-            'options' => array(
-                'general' => array(
-                    'lp_video_section' => 'Video',
-                    'lp_content_section' => 'Details',
-                    'lp_services_section' => 'Services',
-                    'lp_gallery_section' => 'Resim',
-                    // New update 2.8                    // 'lp_openFields_section' => 'Listing Global Form Fields',
-                    // End New update 2.8
-                    'lp_features_section' => 'Listing Features',
-                    'lp_additional_section' => 'Additional Details',
-                    'lp_faqs_section' => 'FAQs',
-                    'lp_event_section' => 'Event',
-                    'lp_announcements_section' => 'Announcements',
-                    'lp_offers_section' => 'Offers/Discounts/Deals',
-                    'lp_menu_section' => 'Menu',
-                    'lp_booking_section' => 'Appointments',
-                    'lp_quicks_section' => 'Quick Actions',
-                    'lp_reviews_section' => 'Reviews',
-                    'lp_reviewform_section' => 'Review Form',
-                ),
-                'disabled' => array(
-                    '' => '',
-                ),
-            ),
-        ),
-        array(
-            'id' => 'lp-detail-page-layout6-rsidebar',
-            'type' => 'sorter',
-            'title' => 'Sidebar Layout',
-            'required' => array('lp_detail_page_styles', 'equals', 'lp_detail_page_styles6'),
-            'desc' => 'Shuffle elements within Listing SideBar',
-            'compiler' => 'true',
-            'options' => array(
-                'sidebar' => array(
-                    'lp_mapsocial_section' => 'Map/Contacts',
-                    'lp_event_section' => 'Event',
-                    'lp_booking_section' => 'Appointments',
-                    'lp_timing_section' => 'Timings',
-                    'lp_quicks_section' => 'Quick Actions',
-                    'lp_additional_section' => 'Additional Details',
-                    'lp_offers_section' => 'Offers/Discounts/Deals',
-                    'lp_leadform_section' => 'Leadform',
-                    'lp_sidebarelemnts_section' => 'Detail Page Sidebar Widgets',
-                ),
-                'disabled' => array(
-                    '' => '',
-                ),
-            ),
-        ),
         /* for listing layout3 & 4 */
         array(
             'id' => 'lp-detail-page-layout4-content',

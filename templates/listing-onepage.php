@@ -31,7 +31,7 @@ if ( have_posts() ) {
         }
 
         if ( ! function_exists( 'lp_onepage_capture' ) ) {
-            function lp_onepage_capture( $template ) {
+            function lp_onepage_capture( $template, $vars = array() ) {
                 $template_path = locate_template( $template, false, false );
                 if ( empty( $template_path ) ) {
                     return '';
@@ -45,12 +45,22 @@ if ( have_posts() ) {
                     $post = get_post( get_the_ID() );
                 }
 
+                if ( ! empty( $vars ) && is_array( $vars ) ) {
+                    extract( $vars, EXTR_SKIP );
+                }
+
                 include $template_path;
 
                 $post = $original_post;
 
                 return trim( ob_get_clean() );
             }
+        }
+
+        $currentUserId = get_current_user_id();
+        $showReport    = true;
+        if ( isset( $listingpro_options['lp_detail_page_report_button'] ) && 'off' === $listingpro_options['lp_detail_page_report_button'] ) {
+            $showReport = false;
         }
 
         if ( ! function_exists( 'lp_onepage_collect_keys' ) ) {
@@ -557,7 +567,13 @@ if ( have_posts() ) {
                     if ( isset( $sections_markup['quick'] ) ) {
                         break;
                     }
-                    $quicks_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/sidebar/quicks.php' );
+                    $quicks_markup = lp_onepage_capture(
+                        'templates/single-list/listing-details-style4/sidebar/quicks.php',
+                        array(
+                            'currentUserId' => $currentUserId,
+                            'showReport'    => $showReport,
+                        )
+                    );
                     if ( empty( $quicks_markup ) ) {
                         break;
                     }

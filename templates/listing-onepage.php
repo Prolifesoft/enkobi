@@ -757,7 +757,11 @@ if ( have_posts() ) {
         .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;justify-content:center;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
-        .lp-whatsapp-float{position:fixed;right:20px;bottom:20px;width:50px;height:50px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:1000;}
+        .lp-phone-float,.lp-whatsapp-float{position:fixed;right:20px;width:50px;height:50px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;z-index:1000;box-shadow:0 10px 24px rgba(15,23,42,0.2);}
+        .lp-phone-float{bottom:80px;background:#ef4444;}
+        .lp-phone-float:hover{background:#dc2626;color:#fff;}
+        .lp-whatsapp-float{bottom:20px;background:#25d366;}
+        .lp-whatsapp-float:hover{background:#1ebe5d;color:#fff;}
         .lp-hero-banner{position:relative;min-height:360px;background-size:cover;background-position:center center;border-radius:12px;margin:20px auto;max-width:1170px;overflow:hidden;}
         .lp-hero-banner .lp-header-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.25);}
         .lp-quick-actions{max-width:1170px;margin:20px auto 0;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
@@ -903,6 +907,9 @@ if ( have_posts() ) {
                 <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>
             </div>
         </section>
+        <?php if ( ! empty( $phone ) ) : ?>
+            <a class="lp-phone-float" href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i></a>
+        <?php endif; ?>
         <?php if ( ! empty( $wa_link ) ) : ?>
             <a class="lp-whatsapp-float" href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><i class="fa fa-whatsapp"></i></a>
         <?php endif; ?>

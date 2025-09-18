@@ -1,28 +1,51 @@
 <?php
 /* One-page listing detail template */
+if ( ! function_exists( 'lp_onepage_meta' ) ) {
+    function lp_onepage_meta( $key, $post_id = null ) {
+        $id = $post_id ? $post_id : get_the_ID();
+
+        if ( function_exists( 'listing_get_metabox' ) ) {
+            $value = listing_get_metabox( $key );
+            if ( null !== $value && '' !== $value ) {
+                return $value;
+            }
+        }
+
+        if ( function_exists( 'listingpro_get_metabox' ) ) {
+            $value = listingpro_get_metabox( $key );
+            if ( null !== $value && '' !== $value ) {
+                return $value;
+            }
+        }
+
+        return get_post_meta( $id, $key, true );
+    }
+}
+
+if ( ! function_exists( 'lp_onepage_meta_by_id' ) ) {
+    function lp_onepage_meta_by_id( $key, $post_id ) {
+        if ( function_exists( 'listing_get_metabox_by_ID' ) ) {
+            $value = listing_get_metabox_by_ID( $key, $post_id );
+            if ( null !== $value && '' !== $value ) {
+                return $value;
+            }
+        }
+
+        if ( function_exists( 'listingpro_get_metabox_by_ID' ) ) {
+            $value = listingpro_get_metabox_by_ID( $key, $post_id );
+            if ( null !== $value && '' !== $value ) {
+                return $value;
+            }
+        }
+
+        return get_post_meta( $post_id, $key, true );
+    }
+}
+
 if ( have_posts() ) {
     while ( have_posts() ) {
         the_post();
         global $listingpro_options;
-
-        if ( ! function_exists( 'lp_onepage_meta' ) ) {
-            function lp_onepage_meta( $key, $post_id = null ) {
-                $id = $post_id ? $post_id : get_the_ID();
-                if ( function_exists( 'listingpro_get_metabox' ) ) {
-                    return listingpro_get_metabox( $key );
-                }
-                return get_post_meta( $id, $key, true );
-            }
-        }
-
-        if ( ! function_exists( 'lp_onepage_meta_by_id' ) ) {
-            function lp_onepage_meta_by_id( $key, $post_id ) {
-                if ( function_exists( 'listing_get_metabox_by_ID' ) ) {
-                    return listing_get_metabox_by_ID( $key, $post_id );
-                }
-                return get_post_meta( $post_id, $key, true );
-            }
-        }
 
         if ( ! function_exists( 'lp_onepage_on' ) ) {
             function lp_onepage_on( $flag ) {

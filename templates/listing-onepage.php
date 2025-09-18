@@ -199,7 +199,7 @@ if ( have_posts() ) {
         $enabled_sections = array_flip( $layout_general );
 
         $has_map   = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
-        $has_hours = lp_onepage_on( $hours_show ) && ( is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours ) );
+        $has_hours = is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours );
 
         $sections_markup = array();
         $menu_items      = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
@@ -677,6 +677,10 @@ if ( have_posts() ) {
         .lp-whatsapp-float{position:fixed;right:20px;bottom:20px;width:50px;height:50px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:1000;}
         .lp-hero-banner{position:relative;min-height:360px;background-size:cover;background-position:center center;border-radius:12px;margin:20px auto;max-width:1170px;overflow:hidden;}
         .lp-hero-banner .lp-header-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.25);}
+        .lp-quick-actions{max-width:1170px;margin:20px auto 0;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
+        .lp-quick-actions a{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#f1f5f9;color:#1f2933;font-weight:600;text-decoration:none;transition:all .2s ease;box-shadow:0 6px 18px rgba(15,23,42,0.08);}
+        .lp-quick-actions a:hover{background:#e2e8f0;color:#005f99;box-shadow:0 10px 24px rgba(15,23,42,0.12);}
+        .lp-quick-actions i{font-size:16px;}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -706,6 +710,25 @@ if ( have_posts() ) {
                 <div class="lp-header-overlay"></div>
             </div>
         </section>
+        <?php if ( ! empty( $phone ) || ! empty( $website ) || ! empty( $whatsapp ) || $has_hours || ( $has_map && ! empty( $latitude ) && ! empty( $longitude ) ) ) : ?>
+            <div class="lp-quick-actions">
+                <?php if ( ! empty( $phone ) ) : ?>
+                    <a href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i><?php echo esc_html( $phone ); ?></a>
+                <?php endif; ?>
+                <?php if ( ! empty( $whatsapp ) ) : ?>
+                    <a href="<?php echo esc_url( $wa_link ); ?>" target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i><?php echo esc_html__( 'WhatsApp', 'listingpro' ); ?></a>
+                <?php endif; ?>
+                <?php if ( ! empty( $website ) ) : ?>
+                    <a href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener"><i class="fa fa-globe"></i><?php echo esc_html__( 'Web Sitesi', 'listingpro' ); ?></a>
+                <?php endif; ?>
+                <?php if ( $has_hours ) : ?>
+                    <a href="#hours"><i class="fa fa-clock-o"></i><?php echo esc_html__( 'Çalışma Saatleri', 'listingpro' ); ?></a>
+                <?php endif; ?>
+                <?php if ( $has_map && ! empty( $latitude ) && ! empty( $longitude ) ) : ?>
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank" rel="noopener"><i class="fa fa-map-marker"></i><?php echo esc_html__( 'Harita', 'listingpro' ); ?></a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
         <?php foreach ( $sections_markup as $section_html ) : ?>
             <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         <?php endforeach; ?>
@@ -751,7 +774,7 @@ if ( have_posts() ) {
                     <?php if ( ! empty( $whatsapp ) ) : ?>
                         <li class="lp-contact-whatsapp"><i class="fa fa-whatsapp"></i><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $website_show ) && ! empty( $website ) ) : ?>
+                    <?php if ( ! empty( $website ) ) : ?>
                         <li class="lp-contact-website"><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( lp_onepage_on( $price_show ) && ! empty( $price_html ) ) : ?>

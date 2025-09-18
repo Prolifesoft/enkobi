@@ -585,6 +585,21 @@ if ( have_posts() ) {
             $initial = function_exists( 'mb_substr' ) ? mb_substr( $lp_title, 0, 1 ) : substr( $lp_title, 0, 1 );
             $logo_html = '<span class="lp-logo-initial">' . esc_html( strtoupper( $initial ) ) . '</span>';
         }
+        $header_bg = isset( $listingpro_options['lp_detail_page_styles4_bg'] ) ? $listingpro_options['lp_detail_page_styles4_bg'] : array();
+        $hero_image_url = '';
+        $featured_id    = get_post_thumbnail_id( get_the_ID() );
+        if ( $featured_id ) {
+            $hero_image_url = wp_get_attachment_image_url( $featured_id, 'full' );
+        }
+        if ( empty( $hero_image_url ) && ! empty( $gallery_ids ) ) {
+            $first_gallery = reset( $gallery_ids );
+            if ( $first_gallery ) {
+                $hero_image_url = wp_get_attachment_image_url( $first_gallery, 'full' );
+            }
+        }
+        if ( empty( $hero_image_url ) && ! empty( $header_bg['url'] ) ) {
+            $hero_image_url = $header_bg['url'];
+        }
         ?>
         <style>
         .lp-onepage-header{position:sticky;top:0;background:#fff;z-index:999;border-bottom:1px solid #eee;}
@@ -620,6 +635,8 @@ if ( have_posts() ) {
         .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;justify-content:center;}
         .lp-home-meta li{display:flex;align-items:center;gap:5px;}
         .lp-whatsapp-float{position:fixed;right:20px;bottom:20px;width:50px;height:50px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:1000;}
+        .lp-hero-banner{position:relative;min-height:360px;background-size:cover;background-position:center center;border-radius:12px;margin:20px auto;max-width:1170px;overflow:hidden;}
+        .lp-hero-banner .lp-header-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.25);}
         </style>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
@@ -644,22 +661,9 @@ if ( have_posts() ) {
             </div>
         </header>
 
-        <?php
-        $header_bg = isset( $listingpro_options['lp_detail_page_styles4_bg'] ) ? $listingpro_options['lp_detail_page_styles4_bg'] : array();
-        ?>
         <section id="home" class="lp-section lp-section-home">
-            <div class="lp-listing-top-title-header" <?php if ( ! empty( $header_bg['url'] ) ) : ?>style="background-image:url(<?php echo esc_url( $header_bg['url'] ); ?>)"<?php endif; ?>>
+            <div class="lp-hero-banner" <?php if ( ! empty( $hero_image_url ) ) : ?>style="background-image:url(<?php echo esc_url( $hero_image_url ); ?>)"<?php endif; ?>>
                 <div class="lp-header-overlay"></div>
-                <div class="container pos-relative">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <?php
-                            include locate_template( 'templates/single-list/listing-details-style4/content/title-bar.php' );
-                            get_template_part( 'templates/single-list/listing-details-style4/content/gallery' );
-                            ?>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
         <?php if ( ! empty( $locations ) || ! empty( $categories ) || ! empty( $price_html ) ) : ?>

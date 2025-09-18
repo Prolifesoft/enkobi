@@ -203,7 +203,7 @@ if ( have_posts() ) {
 
         $sections_markup = array();
         $menu_items      = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
-
+        
         foreach ( $layout_general as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
@@ -567,6 +567,48 @@ if ( have_posts() ) {
             $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
         }
         $menu_items['contact'] = __( 'İletişim', 'listingpro' );
+
+        $preferred_menu_order = array(
+            'home'    => __( 'Anasayfa', 'listingpro' ),
+            'about'   => __( 'Hakkımızda', 'listingpro' ),
+            'services'=> __( 'Hizmetler', 'listingpro' ),
+            'video'   => __( 'Video', 'listingpro' ),
+            'gallery' => __( 'Resim', 'listingpro' ),
+            'reviews' => __( 'Yorumlar', 'listingpro' ),
+            'hours'   => __( 'Çalışma Saatleri', 'listingpro' ),
+            'contact' => __( 'İletişim', 'listingpro' ),
+        );
+
+        $filtered_menu = array();
+        foreach ( $preferred_menu_order as $slug => $label ) {
+            if ( 'home' === $slug ) {
+                $filtered_menu[ $slug ] = $label;
+                continue;
+            }
+
+            if ( 'hours' === $slug ) {
+                if ( $has_hours ) {
+                    $filtered_menu[ $slug ] = $label;
+                }
+                continue;
+            }
+
+            if ( isset( $menu_items[ $slug ] ) ) {
+                $filtered_menu[ $slug ] = $menu_items[ $slug ];
+            }
+        }
+
+        $menu_items = $filtered_menu;
+
+        $preferred_section_order = array( 'about', 'services', 'video', 'gallery', 'reviews' );
+        $ordered_sections        = array();
+        foreach ( $preferred_section_order as $section_slug ) {
+            if ( isset( $sections_markup[ $section_slug ] ) ) {
+                $ordered_sections[ $section_slug ] = $sections_markup[ $section_slug ];
+                unset( $sections_markup[ $section_slug ] );
+            }
+        }
+        $sections_markup = $ordered_sections + $sections_markup;
 
         $b_logo       = $listingpro_options['business_logo_switch'];
         $allow_logo   = isset( $listingpro_options['listingpro_allow_logo_styles_switch'] ) ? $listingpro_options['listingpro_allow_logo_styles_switch'] : '';

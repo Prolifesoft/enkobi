@@ -292,7 +292,7 @@ if ( have_posts() ) {
         $has_hours = is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours );
 
         $sections_markup = array();
-        $menu_items      = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
+        $menu_items      = array();
         
         foreach ( $layout_sections as $section_key ) {
             switch ( $section_key ) {
@@ -631,7 +631,6 @@ if ( have_posts() ) {
                     </section>
                     <?php
                     $sections_markup['reviews'] = ob_get_clean();
-                    $menu_items['reviews']      = __( 'Yorumlar', 'listingpro' );
                     break;
 
                 case 'lp_reviewform_section':
@@ -658,23 +657,16 @@ if ( have_posts() ) {
         }
 
         $preferred_menu_order = array(
-            'home'    => __( 'Anasayfa', 'listingpro' ),
             'about'   => __( 'Hakkımızda', 'listingpro' ),
             'services'=> __( 'Hizmetler', 'listingpro' ),
             'video'   => __( 'Video', 'listingpro' ),
             'gallery' => __( 'Resim', 'listingpro' ),
-            'reviews' => __( 'Yorumlar', 'listingpro' ),
             'hours'   => __( 'Çalışma Saatleri', 'listingpro' ),
             'contact' => __( 'İletişim', 'listingpro' ),
         );
 
         $filtered_menu = array();
         foreach ( $preferred_menu_order as $slug => $label ) {
-            if ( 'home' === $slug ) {
-                $filtered_menu[ $slug ] = $label;
-                continue;
-            }
-
             if ( 'hours' === $slug ) {
                 if ( $has_hours ) {
                     $filtered_menu[ $slug ] = $label;
@@ -736,6 +728,8 @@ if ( have_posts() ) {
         .lp-onepage-header{position:sticky;top:0;background:#fff;z-index:999;border-bottom:1px solid #eee;}
         .lp-onepage-header-inner{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:15px 0;}
         .lp-onepage-brand{display:flex;align-items:center;gap:15px;}
+        .lp-onepage-brand-link{display:flex;align-items:center;gap:15px;text-decoration:none;color:inherit;}
+        .lp-onepage-brand-link:hover{color:inherit;}
         .lp-onepage-logo{width:60px;height:60px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#eef2f7;font-weight:700;font-size:22px;color:#1f2933;text-transform:uppercase;}
         .lp-onepage-logo img{width:100%;height:100%;object-fit:cover;}
         .lp-logo-initial{display:block;width:100%;height:100%;line-height:60px;text-align:center;}
@@ -784,8 +778,10 @@ if ( have_posts() ) {
         <header class="lp-onepage-header">
             <div class="container lp-onepage-header-inner">
             <div class="lp-onepage-brand">
-                <div class="lp-onepage-logo"><?php echo $logo_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-            <span class="lp-onepage-name"><?php echo esc_html( $lp_title ); ?></span>
+                <a href="#home" class="lp-onepage-brand-link">
+                    <div class="lp-onepage-logo"><?php echo $logo_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+                    <span class="lp-onepage-name"><?php echo esc_html( $lp_title ); ?></span>
+                </a>
             </div>
             <nav class="lp-onepage-nav">
                 <ul>

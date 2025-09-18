@@ -53,23 +53,61 @@ if ( have_posts() ) {
             }
         }
 
-        $layout_general = array(
-            'lp_content_section',
-            'lp_services_section',
-            'lp_features_section',
-            'lp_gallery_section',
-            'lp_video_section',
-            'lp_announcements_section',
-            'lp_offers_section',
-            'lp_menu_section',
-            'lp_event_section',
-            'lp_booking_section',
-            'lp_quicks_section',
-            'lp_faqs_section',
-            'lp_additional_section',
-            'lp_reviews_section',
-            'lp_reviewform_section',
-        );
+        if ( ! function_exists( 'lp_onepage_collect_keys' ) ) {
+            function lp_onepage_collect_keys( $option_array ) {
+                $keys = array();
+                if ( is_array( $option_array ) ) {
+                    foreach ( $option_array as $key => $value ) {
+                        if ( is_string( $key ) && '' !== $key && ! is_numeric( $key ) ) {
+                            $keys[] = $key;
+                        } elseif ( is_string( $value ) && '' !== $value ) {
+                            $keys[] = $value;
+                        }
+                    }
+                }
+                return $keys;
+            }
+        }
+
+        $layout_general = array();
+        if ( isset( $listingpro_options['lp-detail-page-layout4-content']['general'] ) ) {
+            $layout_general = lp_onepage_collect_keys( $listingpro_options['lp-detail-page-layout4-content']['general'] );
+        }
+
+        $layout_sidebar = array();
+        if ( isset( $listingpro_options['lp-detail-page-layout4-rsidebar']['sidebar'] ) ) {
+            $layout_sidebar = lp_onepage_collect_keys( $listingpro_options['lp-detail-page-layout4-rsidebar']['sidebar'] );
+        }
+
+        $layout_sections = $layout_general;
+        foreach ( $layout_sidebar as $sidebar_key ) {
+            if ( ! in_array( $sidebar_key, $layout_sections, true ) ) {
+                $layout_sections[] = $sidebar_key;
+            }
+        }
+
+        if ( empty( $layout_sections ) ) {
+            $layout_sections = array(
+                'lp_content_section',
+                'lp_services_section',
+                'lp_features_section',
+                'lp_gallery_section',
+                'lp_video_section',
+                'lp_announcements_section',
+                'lp_offers_section',
+                'lp_menu_section',
+                'lp_event_section',
+                'lp_booking_section',
+                'lp_quicks_section',
+                'lp_faqs_section',
+                'lp_additional_section',
+                'lp_reviews_section',
+                'lp_reviewform_section',
+                'lp_sidebar_video',
+                'lp_mapsocial_section',
+                'lp_timing_section',
+            );
+        }
 
         $description = lp_onepage_meta( 'lp_listing_description' );
         if ( empty( $description ) ) {
@@ -223,7 +261,7 @@ if ( have_posts() ) {
         $sections_markup = array();
         $menu_items      = array( 'home' => __( 'Anasayfa', 'listingpro' ) );
         
-        foreach ( $layout_general as $section_key ) {
+        foreach ( $layout_sections as $section_key ) {
             switch ( $section_key ) {
                 case 'lp_content_section':
                     if ( empty( $description ) || isset( $sections_markup['about'] ) ) {
@@ -316,6 +354,7 @@ if ( have_posts() ) {
                     $menu_items['gallery']      = __( 'Resim', 'listingpro' );
                     break;
 
+                case 'lp_sidebar_video':
                 case 'lp_video_section':
                     if ( empty( $video_html ) || isset( $sections_markup['video'] ) ) {
                         break;
@@ -579,14 +618,6 @@ if ( have_posts() ) {
             }
         }
 
-        if ( $has_map ) {
-            $menu_items['map'] = __( 'Harita', 'listingpro' );
-        }
-        if ( $has_hours ) {
-            $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
-        }
-        $menu_items['contact'] = __( 'İletişim', 'listingpro' );
-
         $preferred_menu_order = array(
             'home'    => __( 'Anasayfa', 'listingpro' ),
             'about'   => __( 'Hakkımızda', 'listingpro' ),
@@ -701,6 +732,15 @@ if ( have_posts() ) {
         .lp-quick-actions a:hover{background:#e2e8f0;color:#005f99;box-shadow:0 10px 24px rgba(15,23,42,0.12);}
         .lp-quick-actions i{font-size:16px;}
         </style>
+        <?php
+        if ( $has_map && ! isset( $menu_items['map'] ) && in_array( 'lp_mapsocial_section', $layout_sections, true ) ) {
+            $menu_items['map'] = __( 'Harita', 'listingpro' );
+        }
+        if ( $has_hours && ! isset( $menu_items['hours'] ) && in_array( 'lp_timing_section', $layout_sections, true ) ) {
+            $menu_items['hours'] = __( 'Çalışma Saatleri', 'listingpro' );
+        }
+        $menu_items['contact'] = __( 'İletişim', 'listingpro' );
+        ?>
         <div class="lp-onepage-wrapper">
         <header class="lp-onepage-header">
             <div class="container lp-onepage-header-inner">

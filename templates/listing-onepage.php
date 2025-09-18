@@ -132,15 +132,22 @@ if ( have_posts() ) {
         $hours     = lp_onepage_meta( 'business_hours' );
         $faqs      = lp_onepage_meta_by_id( 'faqs', get_the_ID() );
         $has_faq   = false;
-        if ( is_array( $faqs ) ) {
-            if ( isset( $faqs['faq'] ) && is_array( $faqs['faq'] ) ) {
-                foreach ( $faqs['faq'] as $faq_item ) {
+        if ( is_array( $faqs ) && isset( $faqs['faq'] ) && is_array( $faqs['faq'] ) ) {
+            foreach ( $faqs['faq'] as $index => $faq_item ) {
+                if ( is_array( $faq_item ) ) {
                     $question = isset( $faq_item['lp_title'] ) ? trim( $faq_item['lp_title'] ) : '';
                     $answer   = isset( $faq_item['lp_desc'] ) ? trim( $faq_item['lp_desc'] ) : '';
-                    if ( '' !== $question || '' !== $answer ) {
-                        $has_faq = true;
-                        break;
+                } else {
+                    $question = trim( (string) $faq_item );
+                    $answer   = '';
+                    if ( isset( $faqs['faqans'][ $index ] ) ) {
+                        $answer = trim( (string) $faqs['faqans'][ $index ] );
                     }
+                }
+
+                if ( '' !== $question || '' !== $answer ) {
+                    $has_faq = true;
+                    break;
                 }
             }
         }
@@ -815,7 +822,7 @@ if ( have_posts() ) {
                 <?php
                 $additional_pos = isset( $listingpro_options['lp_detail_page_additional_styles'] ) ? $listingpro_options['lp_detail_page_additional_styles'] : '';
                 if ( function_exists( 'listing_all_extra_fields_v2_right' ) && 'right' === $additional_pos ) {
-                    listing_all_extra_fields_v2_right( get_the_ID() );
+                    echo listing_all_extra_fields_v2_right( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 }
                 ?>
                 <?php get_template_part( 'templates/single-list/listing-details-style3/sidebar/lead-form' ); ?>

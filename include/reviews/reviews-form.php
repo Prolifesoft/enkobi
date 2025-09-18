@@ -1,4 +1,67 @@
 <?php
+if (!function_exists('lp_prepare_multi_rating_fields')) {
+    function lp_prepare_multi_rating_fields($raw_fields)
+    {
+        $prepared = [];
+
+        if (!is_array($raw_fields) || empty($raw_fields)) {
+            return $prepared;
+        }
+
+        if (isset($raw_fields['default']) && is_array($raw_fields['default'])) {
+            foreach ($raw_fields['default'] as $index => $label) {
+                if (!is_string($label)) {
+                    continue;
+                }
+
+                $label = trim(wp_strip_all_tags($label));
+
+                if ($label === '') {
+                    continue;
+                }
+
+                $prepared[$index] = $label;
+            }
+
+            return $prepared;
+        }
+
+        foreach ($raw_fields as $index => $label) {
+            if (is_array($label)) {
+                foreach ($label as $nested_index => $nested_label) {
+                    if (!is_string($nested_label)) {
+                        continue;
+                    }
+
+                    $nested_label = trim(wp_strip_all_tags($nested_label));
+
+                    if ($nested_label === '') {
+                        continue;
+                    }
+
+                    $prepared[$nested_index] = $nested_label;
+                }
+
+                continue;
+            }
+
+            if (!is_string($label)) {
+                continue;
+            }
+
+            $label = trim(wp_strip_all_tags($label));
+
+            if ($label === '') {
+                continue;
+            }
+
+            $prepared[$index] = $label;
+        }
+
+        return $prepared;
+    }
+}
+
 if (!function_exists('listingpro_get_reviews_form')) {
     function listingpro_get_reviews_form($postid)
     {
@@ -31,8 +94,14 @@ if (!function_exists('listingpro_get_reviews_form')) {
             $enableUsernameField = lp_theme_option('lp_register_username');
 
             $lp_multi_rating_state        =   $listingpro_options['lp_multirating_switch'];
+            $lp_multi_rating_fields       =   [];
+
             if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_state)) {
-                $lp_multi_rating_fields =   get_listing_multi_ratings_fields($postid);
+                $lp_multi_rating_fields = lp_prepare_multi_rating_fields(get_listing_multi_ratings_fields($postid));
+
+                if (empty($lp_multi_rating_fields)) {
+                    $lp_multi_rating_state = 0;
+                }
             }
 
             $lp_detail_page_styles  =   $listingpro_options['lp_detail_page_styles'];
@@ -51,30 +120,19 @@ if (!function_exists('listingpro_get_reviews_form')) {
                     <?php } ?>
                     <form data-lp-recaptcha="<?php echo wp_kses_post($enableCaptcha); ?>" data-lp-recaptcha-sitekey="<?php echo wp_kses_post($gSiteKey); ?>" data-multi-rating="<?php echo esc_attr($lp_multi_rating_state); ?>" id="rewies_form" name="rewies_form" action="" method="post" enctype="multipart/form-data" data-imgcount="<?php echo esc_attr($lp_images_count); ?>" data-imgsize="<?php echo esc_attr($lp_images_size); ?>" data-countnotice="<?php echo esc_attr($lp_imagecount_notice); ?>" data-sizenotice="<?php echo esc_attr($lp_imagesize_notice); ?>">
                         <?php
-                        if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+                        if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
                             echo '<div class="col-md-12 padding-left-0 lp-multi-rating-ui-wrap">';
-                            $lp_rating_field_counter    =    1;
-                            //New update 2.6.10
-                            $switch  = get_option('lp_multirating_switch');
-                            if ($switch == 1 && !empty($switch)) {
-                                $multi_rating_fileds = $lp_multi_rating_fields;
-                            } else {
-                                $multi_rating_fileds = $lp_multi_rating_fields['default'];
-                            }
-                            foreach ($multi_rating_fileds as $k => $lp_multi_rating_field) {
-                                //End New update 2.6.10
+                            foreach ($lp_multi_rating_fields as $k => $lp_multi_rating_field) {
                         ?>
                                 <div class="<?php echo esc_attr($multi_col_class); ?> padding-left-0">
                                     <div class="list-style-none form-review-stars">
-                                        <p><?php echo esc_attr($lp_multi_rating_field); ?></p>
+                                        <p><?php echo esc_html($lp_multi_rating_field); ?></p>
                                         <input type="hidden" data-mrf="<?php echo esc_attr($k); ?>" id="review-rating-<?php echo esc_attr($k); ?>" name="rating-<?php echo esc_attr($k); ?>" class="rating-tooltip lp-multi-rating-val" data-filled="fa fa-star fa-2x" data-empty="fa-regular fa-star-o fa-2x" />
 
                                     </div>
                                 </div>
 
-                            <?php
-                                $lp_rating_field_counter++;
-                            }
+                            <?php }
                             echo '<div class="clearfix"></div>';
                             ?>
                             <div class="col-md-6 padding-left-0">
@@ -189,31 +247,20 @@ if (!function_exists('listingpro_get_reviews_form')) {
                         <?php } ?>
 
                         <?php
-                        if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+                        if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
                             echo '<div class="col-md-12 padding-left-0 lp-multi-rating-ui-wrap">';
-                            $lp_rating_field_counter    =    1;
-                            //New update 2.6.10
-                            $switch  = get_option('lp_multirating_switch');
-                            if ($switch == 1 && !empty($switch)) {
-                                $multi_rating_fileds = $lp_multi_rating_fields;
-                            } else {
-                                $multi_rating_fileds = $lp_multi_rating_fields['default'];
-                            }
-                            //End New update 2.6.10
 
-                            foreach ($multi_rating_fileds as $k => $lp_multi_rating_field) {
+                            foreach ($lp_multi_rating_fields as $k => $lp_multi_rating_field) {
                         ?>
                                 <div class="<?php echo esc_attr($multi_col_class); ?> padding-left-0">
                                     <div class="sfdfdf list-style-none form-review-stars">
-                                        <p><?php echo esc_attr($lp_multi_rating_field); ?></p>
+                                        <p><?php echo esc_html($lp_multi_rating_field); ?></p>
                                         <input type="hidden" data-mrf="<?php echo esc_attr($k); ?>" id="review-rating-<?php echo esc_attr($k); ?>" name="rating-<?php echo esc_attr($k); ?>" class="rating-tooltip lp-multi-rating-val" data-filled="fa fa-star fa-2x" data-empty="fa-regular fa-star-o fa-2x" />
 
                                     </div>
                                 </div>
 
-                            <?php
-                                $lp_rating_field_counter++;
-                            }
+                            <?php }
                             echo '<div class="clearfix"></div>';
                             ?>
                             <div class="col-md-6 padding-left-0">
@@ -399,9 +446,14 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
             $enableUsernameField = lp_theme_option('lp_register_username');
 
             $lp_multi_rating_state        =   $listingpro_options['lp_multirating_switch'];
+            $lp_multi_rating_fields       =   [];
 
             if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_state)) {
-                $lp_multi_rating_fields =   get_listing_multi_ratings_fields($postid);
+                $lp_multi_rating_fields = lp_prepare_multi_rating_fields(get_listing_multi_ratings_fields($postid));
+
+                if (empty($lp_multi_rating_fields)) {
+                    $lp_multi_rating_state = 0;
+                }
             }
 
             $multi_left_col =   '';
@@ -410,7 +462,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
 
 
-            if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+            if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
 
                 $multi_left_col =   'lp-review-form-top-multi';
 
@@ -435,7 +487,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                     <?php
 
-                    if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+                    if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
 
                     ?>
 
@@ -513,23 +565,13 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                     <?php
 
-                    if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+            if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
 
                         echo '<div class="form-group">';
 
                         echo '<div class="col-md-12 padding-left-0 lp-multi-rating-ui-wrap">';
 
-                        $lp_rating_field_counter    =    1;
-                        //New update 2.6.10
-                        $switch  = get_option('lp_multirating_switch');
-                        if ($switch == 1 && !empty($switch)) {
-                            $multi_rating_fileds = $lp_multi_rating_fields;
-                        } else {
-                            $multi_rating_fileds = $lp_multi_rating_fields['default'];
-                        }
-                        //End New update 2.6.10
-
-                        foreach ($multi_rating_fileds as $k => $lp_multi_rating_field) {
+                        foreach ($lp_multi_rating_fields as $k => $lp_multi_rating_field) {
 
                     ?>
 
@@ -537,7 +579,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                                 <div class="sfdfdf list-style-none form-review-stars">
 
-                                    <p><?php echo esc_attr($lp_multi_rating_field); ?></p>
+                                    <p><?php echo esc_html($lp_multi_rating_field); ?></p>
 
                                     <input type="hidden" data-mrf="<?php echo esc_attr($k); ?>" id="review-rating-<?php echo esc_attr($k); ?>" name="rating-<?php echo esc_attr($k); ?>" class="rating-tooltip lp-multi-rating-val" data-filled="fa fa-star fa-2x" data-empty="fa-regular fa-star-o fa-2x" />
 
@@ -549,7 +591,6 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                     <?php
 
-                            $lp_rating_field_counter++;
                         }
 
                         echo '<div class="clearfix"></div>';
@@ -677,7 +718,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                             <?php
 
-                            if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+                            if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
 
                             ?>
 
@@ -749,11 +790,9 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                             <?php
 
-                            if ($lp_multi_rating_state == 1 && is_array($lp_multi_rating_fields) && !empty($lp_multi_rating_fields)) {
+                            if ($lp_multi_rating_state == 1 && !empty($lp_multi_rating_fields)) {
 
                                 echo '<div class="col-md-12 padding-left-0 lp-multi-rating-ui-wrap">';
-
-                                $lp_rating_field_counter    =    1;
 
                                 foreach ($lp_multi_rating_fields as $k => $lp_multi_rating_field) {
 
@@ -763,7 +802,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                                         <div class="sfdfdf list-style-none form-review-stars">
 
-                                            <p><?php echo esc_attr($lp_multi_rating_field); ?></p>
+                                            <p><?php echo esc_html($lp_multi_rating_field); ?></p>
 
                                             <input type="hidden" data-mrf="<?php echo esc_attr($k); ?>" id="review-rating-<?php echo esc_attr($k); ?>" name="rating-<?php echo esc_attr($k); ?>" class="rating-tooltip lp-multi-rating-val" data-filled="fa fa-star fa-2x" data-empty="fa-regular fa-star-o fa-2x" />
 
@@ -771,10 +810,7 @@ if (!function_exists('listingpro_get_reviews_form_v2')) {
 
                                     </div>
 
-                            <?php
-
-                                    $lp_rating_field_counter++;
-                                }
+                            <?php }
 
                                 echo '<div class="clearfix"></div>';
 

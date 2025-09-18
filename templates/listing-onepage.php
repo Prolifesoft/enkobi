@@ -210,7 +210,7 @@ if ( have_posts() ) {
         $announcements_raw = get_post_meta( get_the_ID(), 'lp_listing_announcements', true );
         $has_announcements = is_array( $announcements_raw ) && count( $announcements_raw ) > 0;
 
-        $has_map   = lp_onepage_on( $map_show ) && ! empty( $latitude ) && ! empty( $longitude );
+        $has_map   = ! empty( $latitude ) && ! empty( $longitude );
         $has_hours = is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours );
 
         $sections_markup = array();
@@ -768,31 +768,31 @@ if ( have_posts() ) {
             <div class="container">
                 <h2 class="lp-section-title"><?php echo esc_html( $menu_items['contact'] ); ?></h2>
                 <ul class="lp-contact-list">
-                    <?php if ( ! empty( $locations ) && lp_onepage_on( $location_show ) ) : ?>
+                    <?php if ( ! empty( $locations ) ) : ?>
                         <li class="lp-contact-location"><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li>
                     <?php endif; ?>
                     <?php if ( ! empty( $categories ) ) : ?>
                         <li class="lp-contact-category"><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $location_show ) && ! empty( $address ) ) : ?>
+                    <?php if ( ! empty( $address ) ) : ?>
                         <li class="lp-contact-address"><i class="fa fa-location-arrow"></i><?php echo esc_html( $address ); ?><?php if ( ! empty( $latitude ) && ! empty( $longitude ) ) : ?> <a href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank"><?php echo esc_html__( 'Yol Tarifi Al', 'listingpro' ); ?></a><?php endif; ?></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $contact_show ) && 'yes' === $email_switcher && ! empty( $email ) ) : ?>
+                    <?php if ( 'yes' === $email_switcher && ! empty( $email ) ) : ?>
                         <li class="lp-contact-email"><i class="fa fa-envelope"></i><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( ! empty( $phone ) ) : ?>
                         <li class="lp-contact-phone"><i class="fa fa-phone"></i><a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( ! empty( $whatsapp ) ) : ?>
+                    <?php if ( ! empty( $whatsapp ) && ! empty( $wa_link ) ) : ?>
                         <li class="lp-contact-whatsapp"><i class="fa fa-whatsapp"></i><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank"><?php echo esc_html( $whatsapp ); ?></a></li>
                     <?php endif; ?>
                     <?php if ( ! empty( $website ) ) : ?>
                         <li class="lp-contact-website"><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank"><?php echo esc_html( $website ); ?></a></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $price_show ) && ! empty( $price_html ) ) : ?>
+                    <?php if ( ! empty( $price_html ) ) : ?>
                         <li class="lp-contact-price"><?php echo wp_kses_post( $price_html ); ?></li>
                     <?php endif; ?>
-                    <?php if ( lp_onepage_on( $tags_show ) && ! empty( $tags_terms ) ) :
+                    <?php if ( ! empty( $tags_terms ) ) :
                         $tag_names = array();
                         foreach ( $tags_terms as $tag_term ) {
                             $tag_names[] = $tag_term->name;

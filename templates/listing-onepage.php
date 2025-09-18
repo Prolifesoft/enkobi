@@ -632,8 +632,6 @@ if ( have_posts() ) {
         .lp-social-list{list-style:none;margin:20px 0 0;padding:0;display:flex;gap:10px;justify-content:center;}
         .lp-social-list a{text-decoration:none;font-size:20px;}
         .lp-listing-tagline{margin-top:10px;font-size:18px;color:#555;}
-        .lp-home-meta{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:15px;font-size:14px;color:#777;justify-content:center;}
-        .lp-home-meta li{display:flex;align-items:center;gap:5px;}
         .lp-whatsapp-float{position:fixed;right:20px;bottom:20px;width:50px;height:50px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:1000;}
         .lp-hero-banner{position:relative;min-height:360px;background-size:cover;background-position:center center;border-radius:12px;margin:20px auto;max-width:1170px;overflow:hidden;}
         .lp-hero-banner .lp-header-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.25);}
@@ -666,24 +664,6 @@ if ( have_posts() ) {
                 <div class="lp-header-overlay"></div>
             </div>
         </section>
-        <?php if ( ! empty( $locations ) || ! empty( $categories ) || ! empty( $price_html ) ) : ?>
-        <div class="lp-home-meta-wrap">
-            <div class="container">
-                <ul class="lp-home-meta">
-                    <?php if ( ! empty( $locations ) ) : ?>
-                        <li><i class="fa fa-map-marker"></i><?php echo esc_html( $locations[0]->name ); ?></li>
-                    <?php endif; ?>
-                    <?php if ( ! empty( $categories ) ) : ?>
-                        <li><i class="fa fa-folder-open"></i><?php echo esc_html( $categories[0]->name ); ?></li>
-                    <?php endif; ?>
-                    <?php if ( ! empty( $price_html ) ) : ?>
-                        <li><?php echo wp_kses_post( $price_html ); ?></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-        <?php endif; ?>
-
         <?php foreach ( $sections_markup as $section_html ) : ?>
             <?php echo $section_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         <?php endforeach; ?>

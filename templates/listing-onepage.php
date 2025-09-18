@@ -40,7 +40,14 @@ if ( have_posts() ) {
                 ob_start();
 
                 global $post;
+                $original_post = $post;
+                if ( ! ( $post instanceof WP_Post ) ) {
+                    $post = get_post( get_the_ID() );
+                }
+
                 include $template_path;
+
+                $post = $original_post;
 
                 return trim( ob_get_clean() );
             }

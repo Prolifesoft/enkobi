@@ -357,26 +357,17 @@ if ( have_posts() ) {
                     if ( ! lp_onepage_on( $gallery_show ) || empty( $gallery_ids ) || isset( $sections_markup['gallery'] ) ) {
                         break;
                     }
+                    $gallery_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/gallery.php' );
+                    if ( empty( $gallery_markup ) ) {
+                        break;
+                    }
                     ob_start();
                     ?>
                     <section id="gallery" class="lp-section lp-section-gallery">
                         <div class="container">
                             <h2 class="lp-section-title"><?php echo esc_html__( 'Resim', 'listingpro' ); ?></h2>
-                            <div class="lp-gallery-grid">
-                                <?php foreach ( $gallery_ids as $img_id ) :
-                                    $full = wp_get_attachment_image_src( $img_id, 'full' );
-                                    if ( empty( $full[0] ) ) {
-                                        continue;
-                                    }
-                                    $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-thumb' ) );
-                                    if ( empty( $thumb ) ) {
-                                        $thumb = '<img class="lp-gallery-thumb" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( $lp_title ) . '" />';
-                                    }
-                                    ?>
-                                    <a class="lp-gallery-item" href="<?php echo esc_url( $full[0] ); ?>" rel="prettyPhoto[gallery1]">
-                                        <?php echo $thumb; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                                    </a>
-                                <?php endforeach; ?>
+                            <div class="lp-gallery-slider-wrap">
+                                <?php echo $gallery_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                             </div>
                         </div>
                     </section>
@@ -748,10 +739,12 @@ if ( have_posts() ) {
         .lp-section-title{margin:0 0 36px;font-size:32px;font-weight:700;text-align:center;color:#0f172a;}
         .lp-services-list{list-style:none;margin:0 auto;max-width:780px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;text-align:center;}
         .lp-services-list li{background:#fff;border-radius:14px;padding:16px 18px;font-weight:600;color:#1f2937;box-shadow:0 14px 30px rgba(15,23,42,0.08);}
-        .lp-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;}
-        .lp-gallery-item{display:block;overflow:hidden;border-radius:16px;box-shadow:0 18px 36px rgba(15,23,42,0.12);transition:transform .3s ease,box-shadow .3s ease;}
-        .lp-gallery-item:hover{transform:translateY(-6px);box-shadow:0 24px 44px rgba(15,23,42,0.16);}
-        .lp-gallery-thumb{width:100%;height:100%;object-fit:cover;display:block;}
+        .lp-gallery-slider-wrap{position:relative;}
+        .lp-gallery-slider-wrap .lp-listing-slider{margin:0 auto;}
+        .lp-gallery-slider-wrap .lp-listing-slider .slick-list{margin:0 -12px;}
+        .lp-gallery-slider-wrap .lp-listing-slide-wrap{padding:0 12px;}
+        .lp-gallery-slider-wrap .lp-listing-slide{border-radius:18px;overflow:hidden;box-shadow:0 18px 36px rgba(15,23,42,0.12);}
+        .lp-gallery-slider-wrap .lp-listing-slide img{width:100%;height:auto;display:block;}
         .lp-video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:18px;box-shadow:0 16px 36px rgba(15,23,42,0.18);}
         .lp-video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:18px;}
         #singlepostmap{width:100%;height:360px;border-radius:16px;box-shadow:0 18px 40px rgba(15,23,42,0.1);}

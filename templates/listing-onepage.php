@@ -766,7 +766,7 @@ if ( have_posts() ) {
         .lp-hero{position:relative;min-height:420px;border-radius:28px;overflow:hidden;display:flex;align-items:center;background-size:cover;background-position:center;box-shadow:0 28px 60px rgba(15,23,42,0.35);}
         .lp-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(15,23,42,0.75) 0%,rgba(30,64,175,0.55) 55%,rgba(59,130,246,0.45) 100%);}
         .lp-hero-overlay{position:absolute;inset:0;}
-        .lp-hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:40px;width:100%;padding:48px 36px;}
+        .lp-hero-grid{position:relative;z-index:2;display:flex;flex-direction:column;gap:32px;width:100%;padding:48px 36px;}
         .lp-hero-info{color:#fff;display:flex;flex-direction:column;gap:18px;}
         .lp-hero-brand{display:flex;align-items:center;gap:20px;}
         .lp-hero-logo{width:82px;height:82px;border-radius:50%;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 36px rgba(15,23,42,0.35);}
@@ -782,25 +782,11 @@ if ( have_posts() ) {
         .lp-hero-meta{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:12px;}
         .lp-hero-meta li{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(15,23,42,0.35);backdrop-filter:blur(6px);font-weight:600;font-size:14px;}
         .lp-hero-meta i{font-size:15px;}
-        .lp-hero-card{background:#fff;border-radius:24px;padding:32px;box-shadow:0 28px 48px rgba(15,23,42,0.25);display:flex;flex-direction:column;gap:22px;}
-        .lp-hero-card h3{margin:0;font-size:20px;font-weight:700;color:#0f172a;}
-        .lp-hero-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
-        .lp-hero-list li{display:flex;align-items:center;gap:10px;font-weight:600;color:#0f172a;}
-        .lp-hero-list i{width:18px;text-align:center;color:#2563eb;}
-        .lp-hero-buttons{display:flex;flex-wrap:wrap;gap:12px;}
-        .lp-hero-buttons a{flex:1 1 auto;min-width:140px;padding:12px 18px;border-radius:14px;text-decoration:none;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s ease,box-shadow .2s ease;}
-        .lp-hero-buttons a:hover{transform:translateY(-2px);}
-        .lp-btn-phone{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#b91c1c;box-shadow:0 16px 32px rgba(248,113,113,0.35);}
-        .lp-btn-whatsapp{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534;box-shadow:0 16px 32px rgba(74,222,128,0.35);}
-        .lp-btn-website{background:linear-gradient(135deg,#e0f2fe,#bae6fd);color:#0c4a6e;box-shadow:0 16px 32px rgba(56,189,248,0.35);}
-        .lp-btn-hours{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#5b21b6;box-shadow:0 16px 32px rgba(167,139,250,0.35);}
-        .lp-btn-map{background:linear-gradient(135deg,#fef9c3,#fde68a);color:#92400e;box-shadow:0 16px 32px rgba(250,204,21,0.35);}
         .lp-onepage-wrapper .lp-section:nth-of-type(even){background:#fff;}
         .lp-onepage-wrapper .lp-section:nth-of-type(odd){background:#f8fafc;}
         .lp-section .container > p:last-child{margin-bottom:0;}
         @media (max-width:1200px){
-            .lp-hero-grid{grid-template-columns:1fr;gap:28px;padding:42px 28px;}
-            .lp-hero-card{max-width:420px;margin:0 auto 12px;}
+            .lp-hero-grid{padding:42px 28px;}
         }
         @media (max-width:992px){
             .lp-onepage-header-inner{flex-wrap:wrap;}
@@ -821,8 +807,6 @@ if ( have_posts() ) {
         @media (max-width:576px){
             .lp-onepage-logo{width:56px;height:56px;}
             .lp-hero-logo{width:72px;height:72px;}
-            .lp-hero-buttons{flex-direction:column;}
-            .lp-hero-buttons a{width:100%;}
             .lp-contact-card{padding:24px;}
             .lp-onepage-nav .lp-nav-phone a,.lp-onepage-nav .lp-nav-whatsapp a{width:100%;justify-content:flex-start;}
         }
@@ -905,43 +889,6 @@ if ( have_posts() ) {
                                 </ul>
                             <?php endif; ?>
                         </div>
-                        <aside class="lp-hero-card">
-                            <h3><?php echo esc_html__( 'Hızlı Bilgiler', 'listingpro' ); ?></h3>
-                            <ul class="lp-hero-list">
-                                <?php if ( ! empty( $address ) ) : ?>
-                                    <li><i class="fa fa-location-arrow"></i><?php echo esc_html( $address ); ?></li>
-                                <?php endif; ?>
-                                <?php if ( 'yes' === $email_switcher && ! empty( $email ) ) : ?>
-                                    <li><i class="fa fa-envelope"></i><a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a></li>
-                                <?php endif; ?>
-                                <?php if ( ! empty( $phone ) ) : ?>
-                                    <li><i class="fa fa-phone"></i><a href="tel:<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a></li>
-                                <?php endif; ?>
-                                <?php if ( ! empty( $whatsapp ) && ! empty( $wa_link ) ) : ?>
-                                    <li><i class="fa fa-whatsapp"></i><a href="<?php echo esc_url( $wa_link ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $whatsapp ); ?></a></li>
-                                <?php endif; ?>
-                                <?php if ( ! empty( $website ) ) : ?>
-                                    <li><i class="fa fa-globe"></i><a href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener"><?php echo esc_html( preg_replace( '#^https?://#i', '', $website ) ); ?></a></li>
-                                <?php endif; ?>
-                            </ul>
-                            <div class="lp-hero-buttons">
-                                <?php if ( ! empty( $phone ) ) : ?>
-                                    <a class="lp-btn-phone" href="tel:<?php echo esc_attr( $phone ); ?>"><i class="fa fa-phone"></i><?php echo esc_html__( 'Ara', 'listingpro' ); ?></a>
-                                <?php endif; ?>
-                                <?php if ( ! empty( $whatsapp ) && ! empty( $wa_link ) ) : ?>
-                                    <a class="lp-btn-whatsapp" href="<?php echo esc_url( $wa_link ); ?>" target="_blank" rel="noopener"><i class="fa fa-whatsapp"></i><?php echo esc_html__( 'WhatsApp', 'listingpro' ); ?></a>
-                                <?php endif; ?>
-                                <?php if ( ! empty( $website ) ) : ?>
-                                    <a class="lp-btn-website" href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener"><i class="fa fa-globe"></i><?php echo esc_html__( 'Web Sitesi', 'listingpro' ); ?></a>
-                                <?php endif; ?>
-                                <?php if ( $has_hours ) : ?>
-                                    <a class="lp-btn-hours" href="#hours"><i class="fa fa-clock-o"></i><?php echo esc_html__( 'Çalışma Saatleri', 'listingpro' ); ?></a>
-                                <?php endif; ?>
-                                <?php if ( $has_map && ! empty( $latitude ) && ! empty( $longitude ) ) : ?>
-                                    <a class="lp-btn-map" href="https://www.google.com/maps/search/?api=1&amp;query=<?php echo esc_attr( $latitude ); ?>,<?php echo esc_attr( $longitude ); ?>" target="_blank" rel="noopener"><i class="fa fa-map-marker"></i><?php echo esc_html__( 'Yol Tarifi', 'listingpro' ); ?></a>
-                                <?php endif; ?>
-                            </div>
-                        </aside>
                     </div>
                 </div>
             </div>

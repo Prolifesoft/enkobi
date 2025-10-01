@@ -131,7 +131,6 @@ if ( have_posts() ) {
                 'lp_menu_section',
                 'lp_event_section',
                 'lp_booking_section',
-                'lp_quicks_section',
                 'lp_faqs_section',
                 'lp_additional_section',
                 'lp_reviews_section',
@@ -573,33 +572,6 @@ if ( have_posts() ) {
                     <?php
                     $sections_markup['booking'] = ob_get_clean();
                     $menu_items['booking']      = __( 'Randevu', 'listingpro' );
-                    break;
-
-                case 'lp_quicks_section':
-                    if ( isset( $sections_markup['quick'] ) ) {
-                        break;
-                    }
-                    $quicks_markup = lp_onepage_capture(
-                        'templates/single-list/listing-details-style4/sidebar/quicks.php',
-                        array(
-                            'currentUserId' => $currentUserId,
-                            'showReport'    => $showReport,
-                        )
-                    );
-                    if ( empty( $quicks_markup ) ) {
-                        break;
-                    }
-                    ob_start();
-                    ?>
-                    <section id="quick" class="lp-section lp-section-quick">
-                        <div class="container">
-                            <h2 class="lp-section-title"><?php echo esc_html__( 'Hızlı İşlemler', 'listingpro' ); ?></h2>
-                            <?php echo $quicks_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                        </div>
-                    </section>
-                    <?php
-                    $sections_markup['quick'] = ob_get_clean();
-                    $menu_items['quick']      = __( 'Hızlı İşlemler', 'listingpro' );
                     break;
 
                 case 'lp_reviews_section':

@@ -288,8 +288,9 @@ if ( have_posts() ) {
         $has_map   = ! empty( $latitude ) && ! empty( $longitude );
         $has_hours = is_array( $hours ) ? ! empty( array_filter( $hours ) ) : ! empty( $hours );
 
-        $sections_markup = array();
-        $menu_items      = array();
+        $sections_markup      = array();
+        $menu_items           = array();
+        $has_gallery_slider   = false;
         
         foreach ( $layout_sections as $section_key ) {
             switch ( $section_key ) {
@@ -356,8 +357,23 @@ if ( have_posts() ) {
                     if ( ! lp_onepage_on( $gallery_show ) || empty( $gallery_ids ) || isset( $sections_markup['gallery'] ) ) {
                         break;
                     }
-                    $gallery_markup = lp_onepage_capture( 'templates/single-list/listing-details-style4/content/gallery.php' );
-                    if ( empty( $gallery_markup ) ) {
+                    $gallery_slides = array();
+                    foreach ( $gallery_ids as $img_id ) {
+                        $full  = wp_get_attachment_image_src( $img_id, 'full' );
+                        $thumb = wp_get_attachment_image( $img_id, 'large', false, array( 'class' => 'lp-gallery-slide-image' ) );
+                        if ( empty( $full[0] ) ) {
+                            continue;
+                        }
+                        if ( empty( $thumb ) ) {
+                            $thumb = '<img class="lp-gallery-slide-image" src="' . esc_url( $full[0] ) . '" alt="' . esc_attr( get_the_title() ) . '" />';
+                        }
+                        $gallery_slides[] = sprintf(
+                            '<div class="lp-gallery-slide"><a href="%1$s" rel="prettyPhoto[gallery1]">%2$s</a></div>',
+                            esc_url( $full[0] ),
+                            $thumb
+                        );
+                    }
+                    if ( empty( $gallery_slides ) ) {
                         break;
                     }
                     ob_start();
@@ -365,14 +381,15 @@ if ( have_posts() ) {
                     <section id="gallery" class="lp-section lp-section-gallery">
                         <div class="container">
                             <h2 class="lp-section-title"><?php echo esc_html__( 'Resim', 'listingpro' ); ?></h2>
-                            <div class="lp-gallery-slider-wrap">
-                                <?php echo $gallery_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                            <div class="lp-gallery-slider js-lp-gallery-slider">
+                                <?php echo implode( '', $gallery_slides ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                             </div>
                         </div>
                     </section>
                     <?php
                     $sections_markup['gallery'] = ob_get_clean();
                     $menu_items['gallery']      = __( 'Resim', 'listingpro' );
+                    $has_gallery_slider         = true;
                     break;
 
                 case 'lp_sidebar_video':
@@ -711,12 +728,16 @@ if ( have_posts() ) {
         .lp-section-title{margin:0 0 36px;font-size:32px;font-weight:700;text-align:center;color:#0f172a;}
         .lp-services-list{list-style:none;margin:0 auto;max-width:780px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;text-align:center;}
         .lp-services-list li{background:#fff;border-radius:14px;padding:16px 18px;font-weight:600;color:#1f2937;box-shadow:0 14px 30px rgba(15,23,42,0.08);}
-        .lp-gallery-slider-wrap{position:relative;}
-        .lp-gallery-slider-wrap .lp-listing-slider{margin:0 auto;}
-        .lp-gallery-slider-wrap .lp-listing-slider .slick-list{margin:0 -12px;}
-        .lp-gallery-slider-wrap .lp-listing-slide-wrap{padding:0 12px;}
-        .lp-gallery-slider-wrap .lp-listing-slide{border-radius:18px;overflow:hidden;box-shadow:0 18px 36px rgba(15,23,42,0.12);}
-        .lp-gallery-slider-wrap .lp-listing-slide img{width:100%;height:auto;display:block;}
+        .lp-gallery-slider{position:relative;}
+        .lp-gallery-slide{padding:12px;}
+        .lp-gallery-slide a{display:block;border-radius:18px;overflow:hidden;box-shadow:0 20px 36px rgba(15,23,42,0.16);transition:transform .3s ease,box-shadow .3s ease;}
+        .lp-gallery-slide a:hover{transform:translateY(-6px);box-shadow:0 26px 48px rgba(15,23,42,0.24);}
+        .lp-gallery-slide-image{display:block;width:100%;height:260px;object-fit:cover;}
+        .lp-gallery-slider .slick-arrow{width:44px;height:44px;background:#fff;border-radius:50%;box-shadow:0 12px 28px rgba(15,23,42,0.16);z-index:2;}
+        .lp-gallery-slider .slick-arrow::before{color:#0f172a;font-size:18px;}
+        .lp-gallery-slider .slick-dots{bottom:-36px;}
+        .lp-gallery-slider .slick-dots li button:before{font-size:12px;color:#94a3b8;opacity:1;}
+        .lp-gallery-slider .slick-dots li.slick-active button:before{color:#2563eb;}
         .lp-video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:18px;box-shadow:0 16px 36px rgba(15,23,42,0.18);}
         .lp-video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:18px;}
         #singlepostmap{width:100%;height:360px;border-radius:16px;box-shadow:0 18px 40px rgba(15,23,42,0.1);}
@@ -973,6 +994,34 @@ if ( have_posts() ) {
             var $toggle  = $('.lp-menu-toggle');
             var $nav     = $('.lp-onepage-nav');
             var headerGap = 14;
+
+<?php if ( $has_gallery_slider ) : ?>
+            var $gallerySlider = $('.js-lp-gallery-slider');
+            if ( $gallerySlider.length && $.fn.slick ) {
+                $gallerySlider.not('.slick-initialized').slick({
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    dots: true,
+                    arrows: true,
+                    adaptiveHeight: true,
+                    responsive: [
+                        {
+                            breakpoint: 1200,
+                            settings: {
+                                slidesToShow: 2
+                            }
+                        },
+                        {
+                            breakpoint: 768,
+                            settings: {
+                                slidesToShow: 1
+                            }
+                        }
+                    ]
+                });
+            }
+
+<?php endif; ?>
 
             function getHeaderOffset() {
                 return $header.length ? $header.outerHeight() + headerGap : headerGap;
